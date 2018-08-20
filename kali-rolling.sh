@@ -1281,7 +1281,7 @@ setw -g window-status-format ' #I#[fg=colour246]:#[fg=colour9]#W#[fg=colour246]#
 # messages
 set -g message-attr bold
 set -g message-fg colour15
-set -g message-bg colour16'
+set -g message-bg colour16
 EOF
 #--- Setup alias
 file=~/.bash_aliases; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/bash.bash_aliases

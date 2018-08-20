@@ -36,7 +36,6 @@
 #         ** EDIT this to meet _YOUR_ requirements! **        #
 #-------------------------------------------------------------#
 
-
 if [ 1 -eq 0 ]; then    # This is never true, thus it acts as block comments ;)
 ################################################################################
 ### One liner - Grab the latest version and execute! ###########################
@@ -451,7 +450,7 @@ if [[ $(which gnome-shell) ]]; then
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'RIGHT'   # Set dock to the right
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed true         # Set dock to be always visible
   gsettings set org.gnome.shell favorite-apps \
-    "['terminator.desktop', 'org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'kali-burpsuite.desktop', 'kali-wireshark.desktop', 'gedit.desktop']"
+    "['terminator.desktop', 'org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'kali-burpsuite.desktop', 'kali-wireshark.desktop', 'sublime_text.desktop']"
   #-- Gnome Extension - Alternate-tab (So it doesn't group the same windows up)
   GNOME_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions | sed 's_^.\(.*\).$_\1_')
   echo "${GNOME_EXTENSIONS}" | grep -q "alternate-tab@gnome-shell-extensions.gcampax.github.com" \
@@ -460,6 +459,10 @@ if [[ $(which gnome-shell) ]]; then
   GNOME_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions | sed 's_^.\(.*\).$_\1_')
   echo "${GNOME_EXTENSIONS}" | grep -q "drive-menu@gnome-shell-extensions.gcampax.github.com" \
     || gsettings set org.gnome.shell enabled-extensions "[${GNOME_EXTENSIONS}, 'drive-menu@gnome-shell-extensions.gcampax.github.com']"
+  #-- Gnome Extension - Window list
+  GNOME_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions | sed 's_^.\(.*\).$_\1_')
+  echo "${GNOME_EXTENSIONS}" | grep -q "window-list@gnome-shell-extensions.gcampax.github.com" \
+    || gsettings set org.gnome.shell enabled-extensions "[${GNOME_EXTENSIONS}, 'window-list@gnome-shell-extensions.gcampax.github.com']"
   #--- Workspaces
   gsettings set org.gnome.shell.overrides dynamic-workspaces false                         # Static
   gsettings set org.gnome.desktop.wm.preferences num-workspaces 3                          # Increase workspaces count to 3
@@ -1373,12 +1376,6 @@ file=/etc/bash.bashrc; [ -e "${file}" ] && cp -n $file{,.bkup}
 ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
 grep -q '^EDITOR' "${file}" 2>/dev/null \
   || echo 'EDITOR="vim"' >> "${file}"
-git config --global core.editor "vim"
-#--- Set as default mergetool
-git config --global merge.tool vimdiff
-git config --global merge.conflictstyle diff3
-git config --global mergetool.prompt false
-
 
 ##### Install git - all users
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}git${RESET} ~ revision control"
@@ -1400,7 +1397,7 @@ apt -y -qq install unzip curl firefox-esr \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 #--- Configure firefox
 export DISPLAY=:0.0
-timeout 15 firefox >/dev/null 2>&1                # Start and kill. Files needed for first time run
+timeout 20 firefox >/dev/null 2>&1                # Start and kill. Files needed for first time run
 timeout 5 killall -9 -q -w firefox-esr >/dev/null
 file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'prefs.js' -print -quit)
 [ -e "${file}" ] \
@@ -1583,6 +1580,14 @@ fi
 timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v8.0.1/cyberchef.htm" > /var/www/html/cyberchef.htm \
   || echo -e ' '${RED}'[!] Issue with CyberChef install'${RESET} 1>&2
 
+##### Install Boostnote
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Boostnote${RESET} ~ Note-taking App"
+timeout 300 curl --progress -k -L -f "https://github.com/BoostIO/boost-releases/releases/download/v0.11.8/boostnote_0.11.8_amd64.deb" > /tmp/boostnote.deb \
+  || echo -e ' '${RED}'[!] Issue with Boostnote download'${RESET} 1>&2
+if [ -e /tmp/boostnote.deb ]; then
+  dpkg -i /tmp/boostnote.deb \
+  || echo -e ' '${RED}'[!] Issue with Boostnote install'${RESET} 1>&2
+fi
 ##### Install conky
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}conky${RESET} ~ GUI desktop monitor"
 export DISPLAY=:0.0
@@ -1839,7 +1844,7 @@ msfvenom --list payloads > ~/.msf4/msfvenom/payloads
 msfvenom --list encoders > ~/.msf4/msfvenom/encoders
 msfvenom --help-formats 2> ~/.msf4/msfvenom/formats
 #--- First time run with Metasploit
-(( STAGE++ )); echo -e " ${GREEN}[i]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Starting Metasploit for the first time${RESET} ~ this ${BOLD}will take a ~350 seconds${RESET} (~6 mintues)"
+(( STAGE++ )); echo -e " ${GREEN}[i]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Starting Metasploit for the first time${RESET} ~ this ${BOLD}will take a ~350 seconds${RESET} (~6 minutes)"
 echo "Started at: $(date)"
 systemctl start postgresql
 msfdb start
@@ -1893,6 +1898,17 @@ for plugin in modelines sort externaltools docinfo filebrowser quickopen time sp
   dconf write /org/gnome/gedit/plugins/active-plugins "${new}"
 done
 
+##### Install Sublime
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Sublime${RESET} ~ GUI text editor"
+#--- Install Sublime
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add - \
+  || echo -e ' '${RED}'[!] Issue at sublime gpg key install'${RESET} 1>&2
+apt -y -qq install apt-transport-https \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+apt -qq update
+apt -y -qq install sublime-text \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 ##### Install PyCharm (Community Edition)
 # (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}PyCharm (Community Edition)${RESET} ~ Python IDE"
@@ -2347,11 +2363,10 @@ apt -y -qq install zip unzip \
 
 ##### Install VPN support
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}VPN${RESET} support for Network-Manager"
-for FILE in network-manager-openvpn network-manager-pptp network-manager-vpnc network-manager-openconnect network-manager-iodine; do
+for FILE in network-manager-openvpn network-manager-pptp network-manager-vpnc openconnect network-manager-iodine; do
   apt -y -qq install "${FILE}" \
     || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 done
-
 
 ##### Install hashid
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}hashid${RESET} ~ identify hash types"
@@ -3113,11 +3128,8 @@ apt -y -qq install wordlists curl \
   && gzip -dc < /usr/share/wordlists/rockyou.txt.gz > /usr/share/wordlists/rockyou.txt
 #--- Add 10,000 Top/Worst/Common Passwords
 mkdir -p /usr/share/wordlists/
-(curl --progress -k -L -f "http://xato.net/files/10k most common.zip" > /tmp/10kcommon.zip 2>/dev/null \
-  || curl --progress -k -L -f "http://download.g0tmi1k.com/wordlists/common-10k_most_common.zip" > /tmp/10kcommon.zip 2>/dev/null) \
+curl --progress -k -L -f "https://raw.githubusercontent.com/Chill3d/SecLists/master/Passwords/Common-Credentials/10k-most-common.txt" > /usr/share/wordlists/10kcommon.txt 2>/dev/null \
   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 10kcommon.zip" 1>&2
-unzip -q -o -d /usr/share/wordlists/ /tmp/10kcommon.zip 2>/dev/null   #***!!! hardcoded version! Need to manually check for updates
-mv -f /usr/share/wordlists/10k{\ most\ ,_most_}common.txt
 #--- Linking to more - folders
 [ -e /usr/share/dirb/wordlists ] \
   && ln -sf /usr/share/dirb/wordlists /usr/share/wordlists/dirb
@@ -3454,52 +3466,52 @@ systemctl disable atftpd
 #echo 1 > /proc/sys/net/ipv6/conf/default/disable_ipv6
 
 
-##### Install Pure-FTPd
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Pure-FTPd${RESET} ~ FTP server/file transfer method"
-apt -y -qq install pure-ftpd \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-#--- Setup pure-ftpd
-mkdir -p /var/ftp/
-groupdel ftpgroup 2>/dev/null;
-groupadd ftpgroup
-userdel ftp 2>/dev/null;
-useradd -r -M -d /var/ftp/ -s /bin/false -c "FTP user" -g ftpgroup ftp
-chown -R ftp\:ftpgroup /var/ftp/
-chmod -R 0755 /var/ftp/
-pure-pw userdel ftp 2>/dev/null;
-echo -e '\n' | pure-pw useradd ftp -u ftp -d /var/ftp/
-pure-pw mkdb
-#--- Configure pure-ftpd
-echo "no" > /etc/pure-ftpd/conf/UnixAuthentication
-echo "no" > /etc/pure-ftpd/conf/PAMAuthentication
-echo "yes" > /etc/pure-ftpd/conf/NoChmod
-echo "yes" > /etc/pure-ftpd/conf/ChrootEveryone
-#echo "yes" > /etc/pure-ftpd/conf/AnonymousOnly
-echo "no" > /etc/pure-ftpd/conf/NoAnonymous
-echo "yes" > /etc/pure-ftpd/conf/AnonymousCanCreateDirs
-echo "yes" > /etc/pure-ftpd/conf/AllowAnonymousFXP
-echo "no" > /etc/pure-ftpd/conf/AnonymousCantUpload
-echo "30768 31768" > /etc/pure-ftpd/conf/PassivePortRange              #cat /proc/sys/net/ipv4/ip_local_port_range
-echo "/etc/pure-ftpd/welcome.msg" > /etc/pure-ftpd/conf/FortunesFile   #/etc/motd
-echo "FTP" > /etc/pure-ftpd/welcome.msg
-ln -sf /etc/pure-ftpd/conf/PureDB /etc/pure-ftpd/auth/50pure
-#--- 'Better' MOTD
-apt -y -qq install cowsay \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-echo "moo" | /usr/games/cowsay > /etc/pure-ftpd/welcome.msg
-echo -e " ${YELLOW}[i]${RESET} Pure-FTPd username: anonymous"
-echo -e " ${YELLOW}[i]${RESET} Pure-FTPd password: anonymous"
-#--- Apply settings
-systemctl restart pure-ftpd
-#--- Setup alias
-file=~/.bash_aliases; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/bash.bash_aliases
-([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
-grep -q '^## ftp' "${file}" 2>/dev/null \
-  || echo -e '## ftp\nalias ftproot="cd /var/ftp/"\n' >> "${file}"
-#--- Apply new alias
-source "${file}" || source ~/.zshrc
-#--- Remove from start up
-systemctl disable pure-ftpd
+# ##### Install Pure-FTPd
+# (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Pure-FTPd${RESET} ~ FTP server/file transfer method"
+# apt -y -qq install pure-ftpd \
+#   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+# #--- Setup pure-ftpd
+# mkdir -p /var/ftp/
+# groupdel ftpgroup 2>/dev/null;
+# groupadd ftpgroup
+# userdel ftp 2>/dev/null;
+# useradd -r -M -d /var/ftp/ -s /bin/false -c "FTP user" -g ftpgroup ftp
+# chown -R ftp\:ftpgroup /var/ftp/
+# chmod -R 0755 /var/ftp/
+# pure-pw userdel ftp 2>/dev/null;
+# echo -e '\n' | pure-pw useradd ftp -u ftp -d /var/ftp/
+# pure-pw mkdb
+# #--- Configure pure-ftpd
+# echo "no" > /etc/pure-ftpd/conf/UnixAuthentication
+# echo "no" > /etc/pure-ftpd/conf/PAMAuthentication
+# echo "yes" > /etc/pure-ftpd/conf/NoChmod
+# echo "yes" > /etc/pure-ftpd/conf/ChrootEveryone
+# #echo "yes" > /etc/pure-ftpd/conf/AnonymousOnly
+# echo "no" > /etc/pure-ftpd/conf/NoAnonymous
+# echo "yes" > /etc/pure-ftpd/conf/AnonymousCanCreateDirs
+# echo "yes" > /etc/pure-ftpd/conf/AllowAnonymousFXP
+# echo "no" > /etc/pure-ftpd/conf/AnonymousCantUpload
+# echo "30768 31768" > /etc/pure-ftpd/conf/PassivePortRange              #cat /proc/sys/net/ipv4/ip_local_port_range
+# echo "/etc/pure-ftpd/welcome.msg" > /etc/pure-ftpd/conf/FortunesFile   #/etc/motd
+# echo "FTP" > /etc/pure-ftpd/welcome.msg
+# ln -sf /etc/pure-ftpd/conf/PureDB /etc/pure-ftpd/auth/50pure
+# #--- 'Better' MOTD
+# apt -y -qq install cowsay \
+#   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+# echo "moo" | /usr/games/cowsay > /etc/pure-ftpd/welcome.msg
+# echo -e " ${YELLOW}[i]${RESET} Pure-FTPd username: anonymous"
+# echo -e " ${YELLOW}[i]${RESET} Pure-FTPd password: anonymous"
+# #--- Apply settings
+# systemctl restart pure-ftpd
+# #--- Setup alias
+# file=~/.bash_aliases; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/bash.bash_aliases
+# ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+# grep -q '^## ftp' "${file}" 2>/dev/null \
+#   || echo -e '## ftp\nalias ftproot="cd /var/ftp/"\n' >> "${file}"
+# #--- Apply new alias
+# source "${file}" || source ~/.zshrc
+# #--- Remove from start up
+# systemctl disable pure-ftpd
 
 
 ##### Install samba

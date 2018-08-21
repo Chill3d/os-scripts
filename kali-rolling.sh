@@ -1169,8 +1169,8 @@ git clone -q -b master https://github.com/zsh-users/zsh-autosuggestions.git ${ZS
   || echo -e ' '${RED}'[!] Issue when git cloning zsh-autosuggestions'${RESET} 1>&2
 #--- Configure zsh (themes) ~ https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 sed -i 's/ZSH_THEME=.*/ZSH_THEME="robbyrussell"/' "${file}"   # Other themes: mh, jreese, alanpeabody, candy, terminalparty, kardan, nicoulaj, sunaku
-#--- Configure oh-my-zsh
-sed -i 's/plugins=(.*)/plugins=(git git-extras tmux dirhistory python pip sublime encode64 zsh-autosuggestions)/' "${file}"
+#--- Configure oh-my-zsh plugins
+sed -i 's/  git/  git\n  git-extras\n  tmux\n  dirhistory\n  python\n  pip\n  sublime\n  encode64\n  zsh-autosuggestions/' "${file}"
 #--- Set zsh as default shell (current user)
 chsh -s "$(which zsh)"
 

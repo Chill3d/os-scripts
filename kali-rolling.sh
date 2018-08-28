@@ -1892,10 +1892,15 @@ dconf write /org/gnome/gedit/preferences/editor/insert-spaces true
 dconf write /org/gnome/gedit/preferences/editor/auto-indent true
 for plugin in modelines sort externaltools docinfo filebrowser quickopen time spell; do
   loaded=$( dconf read /org/gnome/gedit/plugins/active-plugins )
-  echo ${loaded} | grep -q "'${plugin}'" \
-    && continue
-  new=$( echo "${loaded} '${plugin}']" | sed "s/'] /', /" )
-  dconf write /org/gnome/gedit/plugins/active-plugins "${new}"
+  if [ -z "$loaded" ]
+  then
+    dconf write /org/gnome/gedit/plugins/active-plugins "['${plugin}']"
+  else
+    echo ${loaded} | grep -q "'${plugin}'" \
+      && continue
+    new=$( echo "${loaded} '${plugin}']" | sed "s/'] /', /" )
+    dconf write /org/gnome/gedit/plugins/active-plugins "${new}"
+  fi
 done
 
 ##### Install Sublime

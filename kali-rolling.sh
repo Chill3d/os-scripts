@@ -3266,6 +3266,23 @@ git pull -q
 popd >/dev/null
 
 
+##### Install Dirsearch
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Dirsearch${RESET} ~ Web Path Scanner"
+apt -y -qq install git \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+git clone -q -b master https://github.com/maurosoria/dirsearch.git /opt/dirsearch-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/dirsearch-git/ >/dev/null
+git pull -q
+popd >/dev/null
+#--- Setup alias
+file=~/.bash_aliases; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/bash.bash_aliases
+([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+grep -q '^## dirsearch' "${file}" 2>/dev/null \
+  || echo -e '## dirsearch\nalias dirsearch="/opt/dirsearch-git/dirsearch.py"\n' >> "${file}"
+#--- Apply new alias
+source "${file}" || source ~/.zshrc
+
 ##### Install credcrack
 # (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}credcrack${RESET} ~ credential harvester via Samba"
 # apt -y -qq install git \

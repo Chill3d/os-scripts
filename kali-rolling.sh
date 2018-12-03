@@ -291,25 +291,25 @@ fi
 
 
 ##### Check to see if there is a second Ethernet card (if so, set an static IP address)
-ip addr show eth1 &>/dev/null
-if [[ "$?" == 0 ]]; then
-  ##### Set a static IP address (192.168.155.175/24) on eth1
-  (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting a ${GREEN}static IP address${RESET} (${BOLD}192.168.155.175/24${RESET}) on ${BOLD}eth1${RESET}"
-  ip addr add 192.168.155.175/24 dev eth1 2>/dev/null
-  route delete default gw 192.168.155.1 2>/dev/null
-  file=/etc/network/interfaces.d/eth1.cfg; [ -e "${file}" ] && cp -n $file{,.bkup}
-  grep -q '^iface eth1 inet static' "${file}" 2>/dev/null \
-    || cat <<EOF > "${file}"
-auto eth1
-iface eth1 inet static
-    address 192.168.155.175
-    netmask 255.255.255.0
-    gateway 192.168.155.1
-    post-up route delete default gw 192.168.155.1
-EOF
-else
-  echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping eth1${RESET} (missing nic)..." 1>&2
-fi
+# ip addr show eth1 &>/dev/null
+# if [[ "$?" == 0 ]]; then
+#   ##### Set a static IP address (192.168.155.175/24) on eth1
+#   (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting a ${GREEN}static IP address${RESET} (${BOLD}192.168.155.175/24${RESET}) on ${BOLD}eth1${RESET}"
+#   ip addr add 192.168.155.175/24 dev eth1 2>/dev/null
+#   route delete default gw 192.168.155.1 2>/dev/null
+#   file=/etc/network/interfaces.d/eth1.cfg; [ -e "${file}" ] && cp -n $file{,.bkup}
+#   grep -q '^iface eth1 inet static' "${file}" 2>/dev/null \
+#     || cat <<EOF > "${file}"
+# auto eth1
+# iface eth1 inet static
+#     address 192.168.155.175
+#     netmask 255.255.255.0
+#     gateway 192.168.155.1
+#     post-up route delete default gw 192.168.155.1
+# EOF
+# else
+#   echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping eth1${RESET} (missing nic)..." 1>&2
+# fi
 
 
 ##### Set static & protecting DNS name servers.   Note: May cause issues with forced values (e.g. captive portals etc)
@@ -435,14 +435,14 @@ sed -i 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="vga=0x0318"
 update-grub
 
 
-if [[ $(dmidecode | grep -i virtual) ]]; then
-  ###### Configure login screen
-  (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}login screen${RESET}"
-  #--- Enable auto (gui) login
-  file=/etc/gdm3/daemon.conf; [ -e "${file}" ] && cp -n $file{,.bkup}
-  sed -i 's/^.*AutomaticLoginEnable = .*/AutomaticLoginEnable = true/' "${file}"
-  sed -i 's/^.*AutomaticLogin = .*/AutomaticLogin = root/' "${file}"
-fi
+# if [[ $(dmidecode | grep -i virtual) ]]; then
+#   ###### Configure login screen
+#   (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}login screen${RESET}"
+#   #--- Enable auto (gui) login
+#   file=/etc/gdm3/daemon.conf; [ -e "${file}" ] && cp -n $file{,.bkup}
+#   sed -i 's/^.*AutomaticLoginEnable = .*/AutomaticLoginEnable = true/' "${file}"
+#   sed -i 's/^.*AutomaticLogin = .*/AutomaticLogin = root/' "${file}"
+# fi
 
 
 if [[ $(which gnome-shell) ]]; then
@@ -746,92 +746,92 @@ else
 fi
 
 
-##### Cosmetics (themes & wallpapers)
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cosmetics${RESET}${RESET} ~ Giving it a personal touch"
-export DISPLAY=:0.0
-#--- axiom / axiomd (May 18 2010) XFCE4 theme ~ http://xfce-look.org/content/show.php/axiom+xfwm?content=90145
-mkdir -p ~/.themes/
-timeout 300 curl --progress -k -L -f "https://www.opendesktop.org/p/1016679/startdownload?file_id=1461767736&file_name=90145-axiom.tar.gz&file_type=application/x-gzip&file_size=134386&url=https%3A%2F%2Fdl.opendesktop.org%2Fapi%2Ffiles%2Fdownload%2Fid%2F1461767736%2Fs%2F11f821d99c4ac95baf4edbf7197c5ddb%2Ft%2F1535478804%2Fu%2F%2F90145-axiom.tar.gz" > /tmp/axiom.tar.gz \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading axiom.tar.gz" 1>&2    #***!!! hardcoded path! #TODO ERROR gzip: stdin: not in gzip format; tar: Child returned status 1; tar: Error is not recoverable: exiting now
-
-tar -zxf /tmp/axiom.tar.gz -C ~/.themes/
-xfconf-query -n -c xsettings -p /Net/ThemeName -s "axiomd"
-xfconf-query -n -c xsettings -p /Net/IconThemeName -s "Vibrancy-Kali-Dark"
-#--- Get new desktop wallpaper      (All are #***!!! hardcoded paths!)
-mkdir -p /usr/share/wallpapers/
-echo -n '[1/10]'; timeout 300 curl --progress -k -L -f "https://www.kali.org/images/wallpapers-01/kali-wp-june-2014_1920x1080_A.png" > /usr/share/wallpapers/kali_blue_3d_a.png \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_blue_3d_a.png" 1>&2
-echo -n '[2/10]'; timeout 300 curl --progress -k -L -f "https://www.kali.org/images/wallpapers-01/kali-wp-june-2014_1920x1080_B.png" > /usr/share/wallpapers/kali_blue_3d_b.png \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_blue_3d_b.png" 1>&2
-echo -n '[3/10]'; timeout 300 curl --progress -k -L -f "https://www.kali.org/images/wallpapers-01/kali-wp-june-2014_1920x1080_G.png" > /usr/share/wallpapers/kali_black_honeycomb.png \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_black_honeycomb.png" 1>&2
-echo -n '[4/10]'; timeout 300 curl --progress -k -L -f "https://lh5.googleusercontent.com/-CW1-qRVBiqc/U7ARd2T9LCI/AAAAAAAAAGw/oantfR6owSg/w1920-h1080/vzex.png" > /usr/share/wallpapers/kali_blue_splat.png \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_blue_splat.png" 1>&2
-echo -n '[5/10]'; timeout 300 curl --progress -k -L -f "http://wallpaperstock.net/kali-linux_wallpapers_39530_1920x1080.jpg" > /usr/share/wallpapers/kali-linux_wallpapers_39530.png \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali-linux_wallpapers_39530.png" 1>&2
-# echo -n '[6/10]'; timeout 300 curl --progress -k -L -f "http://em3rgency.com/wp-content/uploads/2012/12/Kali-Linux-faded-no-Dragon-small-text.png" > /usr/share/wallpapers/kali_black_clean.png \
-#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_black_clean.png" 1>&2
-#echo -n '[7/10]'; timeout 300 curl --progress -k -L -f "http://www.hdwallpapers.im/download/kali_linux-wallpaper.jpg" > /usr/share/wallpapers/kali_black_stripes.jpg \
-#  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_black_stripes.jpg" 1>&2
-# echo -n '[8/10]'; timeout 300 curl --progress -k -L -f "http://fc01.deviantart.net/fs71/f/2011/118/e/3/bt___edb_wallpaper_by_xxdigipxx-d3f4nxv.png" > /usr/share/wallpapers/kali_bt_edb.jpg \
-#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_bt_edb.jpg" 1>&2
-echo -n '[9/10]'; timeout 300 curl --progress -k -L -f "http://pre07.deviantart.net/58d1/th/pre/i/2015/223/4/8/kali_2_0_alternate_wallpaper_by_xxdigipxx-d95800s.png" > /usr/share/wallpapers/kali_2_0_alternate_wallpaper.png \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_2_0_alternate_wallpaper.png" 1>&2
-echo -n '[10/10]'; timeout 300 curl --progress -k -L -f "http://pre01.deviantart.net/4210/th/pre/i/2015/195/3/d/kali_2_0__personal__wp_by_xxdigipxx-d91c8dq.png" > /usr/share/wallpapers/kali_2_0_personal.png \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_2_0_personal.png" 1>&2
-_TMP="$(find /usr/share/wallpapers/ -maxdepth 1 -type f -name 'kali_*' | xargs -n1 file | grep -i 'HTML\|empty' | cut -d ':' -f1)"
-for FILE in $(echo ${_TMP}); do rm -f "${FILE}"; done
-#--- Kali 1 (Wallpaper)
-[ -e "/usr/share/wallpapers/kali_default-1440x900.jpg" ] \
-  && ln -sf /usr/share/wallpapers/kali/contents/images/1440x900.jpg /usr/share/wallpapers/kali_default-1440x900.jpg
-#--- Kali 2 (Login)
-[ -e "/usr/share/gnome-shell/theme/KaliLogin.png" ] \
-  && cp -f /usr/share/gnome-shell/theme/KaliLogin.png /usr/share/wallpapers/KaliLogin2.0-login.png
-#--- Kali 2 & Rolling (Wallpaper)
-[ -e "/usr/share/images/desktop-base/kali-wallpaper_1920x1080.png" ] \
-  && ln -sf /usr/share/images/desktop-base/kali-wallpaper_1920x1080.png /usr/share/wallpapers/kali_default2.0-1920x1080.png
-#--- New wallpaper & add to startup (so its random each login)
-mkdir -p /usr/local/bin/
-file=/usr/local/bin/rand-wallpaper; [ -e "${file}" ] && cp -n $file{,.bkup}
-cat <<EOF > "${file}" \
-  || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
-#!/bin/bash
-
-wallpaper="\$(shuf -n1 -e \$(find /usr/share/wallpapers/ -maxdepth 1 -name 'kali_*'))"
-
-## XFCE - Desktop wallpaper
-/usr/bin/xfconf-query -n -c xfce4-desktop -p /backdrop/screen0/monitor0/image-show -t bool -s true
-/usr/bin/xfconf-query -n -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -t string -s "\${wallpaper}"
-/usr/bin/xfconf-query -n -c xfce4-desktop -p /backdrop/screen0/monitor0/workspace0/last-image -t string -s "\${wallpaper}"
-
-## GNOME - Desktop wallpaper
-#[[ $(which gnome-shell) ]] \
-#  && dconf write /org/gnome/desktop/background/picture-uri "'file://\${wallpaper}'"
-
-## Change lock wallpaper (before swipe) - kali 2 & rolling
-/usr/bin/dconf write /org/gnome/desktop/screensaver/picture-uri "'file://\${wallpaper}'"
-
-## Change login wallpaper (after swipe) - kali 2
-#cp -f "\${wallpaper}" /usr/share/gnome-shell/theme/KaliLogin.png
-
-/usr/bin/xfdesktop --reload 2>/dev/null &
-EOF
-chmod -f 0500 "${file}"
-#--- Run now
-bash "${file}"
-#--- Add to startup
-mkdir -p ~/.config/autostart/
-file=~/.config/autostart/wallpaper.desktop; [ -e "${file}" ] && cp -n $file{,.bkup}
-cat <<EOF > "${file}" \
-  || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
-[Desktop Entry]
-Type=Application
-Exec=/usr/local/bin/rand-wallpaper
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-Name=wallpaper
-EOF
+# ##### Cosmetics (themes & wallpapers)
+# (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cosmetics${RESET}${RESET} ~ Giving it a personal touch"
+# export DISPLAY=:0.0
+# #--- axiom / axiomd (May 18 2010) XFCE4 theme ~ http://xfce-look.org/content/show.php/axiom+xfwm?content=90145
+# mkdir -p ~/.themes/
+# timeout 300 curl --progress -k -L -f "https://www.opendesktop.org/p/1016679/startdownload?file_id=1461767736&file_name=90145-axiom.tar.gz&file_type=application/x-gzip&file_size=134386&url=https%3A%2F%2Fdl.opendesktop.org%2Fapi%2Ffiles%2Fdownload%2Fid%2F1461767736%2Fs%2F11f821d99c4ac95baf4edbf7197c5ddb%2Ft%2F1535478804%2Fu%2F%2F90145-axiom.tar.gz" > /tmp/axiom.tar.gz \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading axiom.tar.gz" 1>&2    #***!!! hardcoded path! #TODO ERROR gzip: stdin: not in gzip format; tar: Child returned status 1; tar: Error is not recoverable: exiting now
+#
+# tar -zxf /tmp/axiom.tar.gz -C ~/.themes/
+# xfconf-query -n -c xsettings -p /Net/ThemeName -s "axiomd"
+# xfconf-query -n -c xsettings -p /Net/IconThemeName -s "Vibrancy-Kali-Dark"
+# #--- Get new desktop wallpaper      (All are #***!!! hardcoded paths!)
+# mkdir -p /usr/share/wallpapers/
+# echo -n '[1/10]'; timeout 300 curl --progress -k -L -f "https://www.kali.org/images/wallpapers-01/kali-wp-june-2014_1920x1080_A.png" > /usr/share/wallpapers/kali_blue_3d_a.png \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_blue_3d_a.png" 1>&2
+# echo -n '[2/10]'; timeout 300 curl --progress -k -L -f "https://www.kali.org/images/wallpapers-01/kali-wp-june-2014_1920x1080_B.png" > /usr/share/wallpapers/kali_blue_3d_b.png \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_blue_3d_b.png" 1>&2
+# echo -n '[3/10]'; timeout 300 curl --progress -k -L -f "https://www.kali.org/images/wallpapers-01/kali-wp-june-2014_1920x1080_G.png" > /usr/share/wallpapers/kali_black_honeycomb.png \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_black_honeycomb.png" 1>&2
+# echo -n '[4/10]'; timeout 300 curl --progress -k -L -f "https://lh5.googleusercontent.com/-CW1-qRVBiqc/U7ARd2T9LCI/AAAAAAAAAGw/oantfR6owSg/w1920-h1080/vzex.png" > /usr/share/wallpapers/kali_blue_splat.png \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_blue_splat.png" 1>&2
+# echo -n '[5/10]'; timeout 300 curl --progress -k -L -f "http://wallpaperstock.net/kali-linux_wallpapers_39530_1920x1080.jpg" > /usr/share/wallpapers/kali-linux_wallpapers_39530.png \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali-linux_wallpapers_39530.png" 1>&2
+# # echo -n '[6/10]'; timeout 300 curl --progress -k -L -f "http://em3rgency.com/wp-content/uploads/2012/12/Kali-Linux-faded-no-Dragon-small-text.png" > /usr/share/wallpapers/kali_black_clean.png \
+# #   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_black_clean.png" 1>&2
+# #echo -n '[7/10]'; timeout 300 curl --progress -k -L -f "http://www.hdwallpapers.im/download/kali_linux-wallpaper.jpg" > /usr/share/wallpapers/kali_black_stripes.jpg \
+# #  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_black_stripes.jpg" 1>&2
+# # echo -n '[8/10]'; timeout 300 curl --progress -k -L -f "http://fc01.deviantart.net/fs71/f/2011/118/e/3/bt___edb_wallpaper_by_xxdigipxx-d3f4nxv.png" > /usr/share/wallpapers/kali_bt_edb.jpg \
+# #   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_bt_edb.jpg" 1>&2
+# echo -n '[9/10]'; timeout 300 curl --progress -k -L -f "http://pre07.deviantart.net/58d1/th/pre/i/2015/223/4/8/kali_2_0_alternate_wallpaper_by_xxdigipxx-d95800s.png" > /usr/share/wallpapers/kali_2_0_alternate_wallpaper.png \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_2_0_alternate_wallpaper.png" 1>&2
+# echo -n '[10/10]'; timeout 300 curl --progress -k -L -f "http://pre01.deviantart.net/4210/th/pre/i/2015/195/3/d/kali_2_0__personal__wp_by_xxdigipxx-d91c8dq.png" > /usr/share/wallpapers/kali_2_0_personal.png \
+#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading kali_2_0_personal.png" 1>&2
+# _TMP="$(find /usr/share/wallpapers/ -maxdepth 1 -type f -name 'kali_*' | xargs -n1 file | grep -i 'HTML\|empty' | cut -d ':' -f1)"
+# for FILE in $(echo ${_TMP}); do rm -f "${FILE}"; done
+# #--- Kali 1 (Wallpaper)
+# [ -e "/usr/share/wallpapers/kali_default-1440x900.jpg" ] \
+#   && ln -sf /usr/share/wallpapers/kali/contents/images/1440x900.jpg /usr/share/wallpapers/kali_default-1440x900.jpg
+# #--- Kali 2 (Login)
+# [ -e "/usr/share/gnome-shell/theme/KaliLogin.png" ] \
+#   && cp -f /usr/share/gnome-shell/theme/KaliLogin.png /usr/share/wallpapers/KaliLogin2.0-login.png
+# #--- Kali 2 & Rolling (Wallpaper)
+# [ -e "/usr/share/images/desktop-base/kali-wallpaper_1920x1080.png" ] \
+#   && ln -sf /usr/share/images/desktop-base/kali-wallpaper_1920x1080.png /usr/share/wallpapers/kali_default2.0-1920x1080.png
+# #--- New wallpaper & add to startup (so its random each login)
+# mkdir -p /usr/local/bin/
+# file=/usr/local/bin/rand-wallpaper; [ -e "${file}" ] && cp -n $file{,.bkup}
+# cat <<EOF > "${file}" \
+#   || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
+# #!/bin/bash
+#
+# wallpaper="\$(shuf -n1 -e \$(find /usr/share/wallpapers/ -maxdepth 1 -name 'kali_*'))"
+#
+# ## XFCE - Desktop wallpaper
+# /usr/bin/xfconf-query -n -c xfce4-desktop -p /backdrop/screen0/monitor0/image-show -t bool -s true
+# /usr/bin/xfconf-query -n -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -t string -s "\${wallpaper}"
+# /usr/bin/xfconf-query -n -c xfce4-desktop -p /backdrop/screen0/monitor0/workspace0/last-image -t string -s "\${wallpaper}"
+#
+# ## GNOME - Desktop wallpaper
+# #[[ $(which gnome-shell) ]] \
+# #  && dconf write /org/gnome/desktop/background/picture-uri "'file://\${wallpaper}'"
+#
+# ## Change lock wallpaper (before swipe) - kali 2 & rolling
+# /usr/bin/dconf write /org/gnome/desktop/screensaver/picture-uri "'file://\${wallpaper}'"
+#
+# ## Change login wallpaper (after swipe) - kali 2
+# #cp -f "\${wallpaper}" /usr/share/gnome-shell/theme/KaliLogin.png
+#
+# /usr/bin/xfdesktop --reload 2>/dev/null &
+# EOF
+# chmod -f 0500 "${file}"
+# #--- Run now
+# bash "${file}"
+# #--- Add to startup
+# mkdir -p ~/.config/autostart/
+# file=~/.config/autostart/wallpaper.desktop; [ -e "${file}" ] && cp -n $file{,.bkup}
+# cat <<EOF > "${file}" \
+#   || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
+# [Desktop Entry]
+# Type=Application
+# Exec=/usr/local/bin/rand-wallpaper
+# Hidden=false
+# NoDisplay=false
+# X-GNOME-Autostart-enabled=true
+# Name=wallpaper
+# EOF
 
 
 ##### Configure file   Note: need to restart xserver for effect
@@ -868,15 +868,15 @@ grep -q '^file:///tmp ' "${file}" 2>/dev/null \
 grep -q '^file:///usr/share ' "${file}" 2>/dev/null \
   || echo 'file:///usr/share Kali Tools' >> "${file}"
 grep -q '^file:///opt ' "${file}" 2>/dev/null \
-  || echo 'file:///opt /opt' >> "${file}"
-grep -q '^file:///usr/local/src ' "${file}" 2>/dev/null \
-  || echo 'file:///usr/local/src SRC' >> "${file}"
-grep -q '^file:///var/ftp ' "${file}" 2>/dev/null \
-  || echo 'file:///var/ftp FTP' >> "${file}"
-grep -q '^file:///var/samba ' "${file}" 2>/dev/null \
-  || echo 'file:///var/samba Samba' >> "${file}"
-grep -q '^file:///var/tftp ' "${file}" 2>/dev/null \
-  || echo 'file:///var/tftp TFTP' >> "${file}"
+  || echo 'file:///opt Tools' >> "${file}"
+# grep -q '^file:///usr/local/src ' "${file}" 2>/dev/null \
+#   || echo 'file:///usr/local/src SRC' >> "${file}"
+# grep -q '^file:///var/ftp ' "${file}" 2>/dev/null \
+#   || echo 'file:///var/ftp FTP' >> "${file}"
+# grep -q '^file:///var/samba ' "${file}" 2>/dev/null \
+#   || echo 'file:///var/samba Samba' >> "${file}"
+# grep -q '^file:///var/tftp ' "${file}" 2>/dev/null \
+#   || echo 'file:///var/tftp TFTP' >> "${file}"
 grep -q '^file:///var/www/html ' "${file}" 2>/dev/null \
   || echo 'file:///var/www/html WWW' >> "${file}"
 #--- Configure file browser - Thunar (need to re-login for effect)
@@ -1144,11 +1144,11 @@ cat <<EOF > "${file}" \
 [plugins]
 EOF
 #--- Set terminator for XFCE's default
-mkdir -p ~/.config/xfce4/
-file=~/.config/xfce4/helpers.rc; [ -e "${file}" ] && cp -n $file{,.bkup}    #exo-preferred-applications   #xdg-mime default
-([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
-sed -i 's_^TerminalEmulator=.*_TerminalEmulator=debian-x-terminal-emulator_' "${file}" 2>/dev/null \
-  || echo -e 'TerminalEmulator=debian-x-terminal-emulator' >> "${file}"
+# mkdir -p ~/.config/xfce4/
+# file=~/.config/xfce4/helpers.rc; [ -e "${file}" ] && cp -n $file{,.bkup}    #exo-preferred-applications   #xdg-mime default
+# ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+# sed -i 's_^TerminalEmulator=.*_TerminalEmulator=debian-x-terminal-emulator_' "${file}" 2>/dev/null \
+#   || echo -e 'TerminalEmulator=debian-x-terminal-emulator' >> "${file}"
 
 
 ##### Install ZSH & Oh-My-ZSH - root user.   Note:  'Open terminal here', will not work with ZSH.   Make sure to have tmux already installed
@@ -1400,188 +1400,188 @@ git config --global push.default simple
 
 
 ##### Setup firefox
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}firefox${RESET} ~ GUI web browser"
-apt -y -qq install unzip curl firefox-esr \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-#--- Configure firefox
-export DISPLAY=:0.0
-timeout 20 firefox >/dev/null 2>&1                # Start and kill. Files needed for first time run
-timeout 5 killall -9 -q -w firefox-esr >/dev/null
-file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'prefs.js' -print -quit)
-[ -e "${file}" ] \
-  && cp -n $file{,.bkup}   #/etc/firefox-esr/pref/*.js #TODO sed don't find theses lines
-([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
-sed -i 's/^.network.proxy.socks_remote_dns.*/user_pref("network.proxy.socks_remote_dns", true);' "${file}" 2>/dev/null \
-  || echo 'user_pref("network.proxy.socks_remote_dns", true);' >> "${file}"
-sed -i 's/^.browser.safebrowsing.enabled.*/user_pref("browser.safebrowsing.enabled", false);' "${file}" 2>/dev/null \
-  || echo 'user_pref("browser.safebrowsing.enabled", false);' >> "${file}"
-sed -i 's/^.browser.safebrowsing.malware.enabled.*/user_pref("browser.safebrowsing.malware.enabled", false);' "${file}" 2>/dev/null \
-  || echo 'user_pref("browser.safebrowsing.malware.enabled", false);' >> "${file}"
-sed -i 's/^.browser.safebrowsing.remoteLookups.enabled.*/user_pref("browser.safebrowsing.remoteLookups.enabled", false);' "${file}" 2>/dev/null \
-  || echo 'user_pref("browser.safebrowsing.remoteLookups.enabled", false);' >> "${file}"
-sed -i 's/^.*browser.startup.page.*/user_pref("browser.startup.page", 0);' "${file}" 2>/dev/null \
-  || echo 'user_pref("browser.startup.page", 0);' >> "${file}"
-sed -i 's/^.*privacy.donottrackheader.enabled.*/user_pref("privacy.donottrackheader.enabled", true);' "${file}" 2>/dev/null \
-  || echo 'user_pref("privacy.donottrackheader.enabled", true);' >> "${file}"
-sed -i 's/^.*browser.showQuitWarning.*/user_pref("browser.showQuitWarning", true);' "${file}" 2>/dev/null \
-  || echo 'user_pref("browser.showQuitWarning", true);' >> "${file}"
-sed -i 's/^.*extensions.https_everywhere._observatory.popup_shown.*/user_pref("extensions.https_everywhere._observatory.popup_shown", true);' "${file}" 2>/dev/null \
-  || echo 'user_pref("extensions.https_everywhere._observatory.popup_shown", true);' >> "${file}"
-sed -i 's/^.network.security.ports.banned.override/user_pref("network.security.ports.banned.override", "1-65455");' "${file}" 2>/dev/null \
-  || echo 'user_pref("network.security.ports.banned.override", "1-65455");' >> "${file}"
-#--- Replace bookmarks (base: http://pentest-bookmarks.googlecode.com)
-file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'bookmarks.html' -print -quit) #TODO don't find thise folder
-[ -e "${file}" ] \
-  && cp -n $file{,.bkup}   #/etc/firefox-esr/profile/bookmarks.html
-#timeout 300 curl --progress -k -L -f "http://pentest-bookmarks.googlecode.com/files/bookmarksv1.5.html" > /tmp/bookmarks_new.html \
-#  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading bookmarks_new.html" 1>&2      #***!!! hardcoded version! Need to manually check for updates
-#--- Configure bookmarks
-#awk '!a[$0]++' /tmp/bookmarks_new.html \
-#  | \egrep -v ">(Latest Headlines|Getting Started|Recently Bookmarked|Recent Tags|Mozilla Firefox|Help and Tutorials|Customize Firefox|Get Involved|About Us|Hacker Media|Bookmarks Toolbar|Most Visited)</" \
-#  | \egrep -v "^    </DL><p>" \
-#  | \egrep -v "^<DD>Add" > "${file}"
-sed -i 's#^</DL><p>#        </DL><p>\n    </DL><p>\n</DL><p>#' "${file}"                                          # Fix import issues from pentest-bookmarks...
-sed -i 's#^    <DL><p>#    <DL><p>\n    <DT><A HREF="http://127.0.0.1/">localhost</A>#' "${file}"                 # Add localhost to bookmark toolbar (before hackery folder)
-sed -i 's#^    <DL><p>#    <DL><p>\n    <DT><A HREF="file:///var/www/html/cyberchef.htm">CyberChef</A>#' "${file}"                 # Add CyberChef application
-# sed -i 's#^</DL><p>#    <DT><A HREF="https://127.0.0.1:8834/">Nessus</A>\n</DL><p>#' "${file}"                    # Add Nessus UI bookmark toolbar
-# [ "${openVAS}" != "false" ] \
-#   && sed -i 's#^</DL><p>#    <DT><A HREF="https://127.0.0.1:9392/">OpenVAS</A>\n</DL><p>#' "${file}"              # Add OpenVAS UI to bookmark toolbar
-# sed -i 's#^</DL><p>#    <DT><A HREF="http://127.0.0.1:3000/ui/panel">BeEF</A>\n</DL><p>#' "${file}"               # Add BeEF UI to bookmark toolbar
-sed -i 's#^</DL><p>#    <DT><A HREF="http://127.0.0.1/rips/">RIPS</A>\n</DL><p>#' "${file}"                       # Add RIPs to bookmark toolbar
-sed -i 's#^</DL><p>#    <DT><A HREF="https://paulschou.com/tools/xlate/">XLATE</A>\n</DL><p>#' "${file}"          # Add XLATE to bookmark toolbar
-# sed -i 's#^</DL><p>#    <DT><A HREF="https://hackvertor.co.uk/public">HackVertor</A>\n</DL><p>#' "${file}"        # Add HackVertor to bookmark toolbar
-# sed -i 's#^</DL><p>#    <DT><A HREF="http://www.irongeek.com/skiddypad.php">SkiddyPad</A>\n</DL><p>#' "${file}"   # Add Skiddypad to bookmark toolbar
-sed -i 's#^</DL><p>#    <DT><A HREF="https://www.exploit-db.com/search/">Exploit-DB</A>\n</DL><p>#' "${file}"     # Add Exploit-DB to bookmark toolbar
-sed -i 's#^</DL><p>#    <DT><A HREF="http://offset-db.com/">Offset-DB</A>\n</DL><p>#' "${file}"                   # Add Offset-DB to bookmark toolbar
-# sed -i 's#^</DL><p>#    <DT><A HREF="http://shell-storm.org/shellcode/">Shelcodes</A>\n</DL><p>#' "${file}"       # Add Shelcodes to bookmark toolbar
-# sed -i 's#^</DL><p>#    <DT><A HREF="http://ropshell.com/">ROP Shell</A>\n</DL><p>#' "${file}"                    # Add ROP Shell to bookmark toolbar
-sed -i 's#^</DL><p>#    <DT><A HREF="https://ifconfig.io/">ifconfig</A>\n</DL><p>#' "${file}"                     # Add ifconfig.io to bookmark toolbar
-sed -i 's#<HR>#<DT><H3 ADD_DATE="1303667175" LAST_MODIFIED="1303667175" PERSONAL_TOOLBAR_FOLDER="true">Bookmarks Toolbar</H3>\n<DD>Add bookmarks to this folder to see them displayed on the Bookmarks Toolbar#' "${file}"
-#--- Clear bookmark cache
-find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -mindepth 1 -type f -name "places.sqlite" -delete
-find ~/.mozilla/firefox/*.default*/bookmarkbackups/ -type f -delete
-#--- Set firefox for XFCE's default
-mkdir -p ~/.config/xfce4/
-file=~/.config/xfce4/helpers.rc; [ -e "${file}" ] && cp -n $file{,.bkup}    #exo-preferred-applications   #xdg-mime default
-([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
-sed -i 's#^WebBrowser=.*#WebBrowser=firefox#' "${file}" 2>/dev/null \
-  || echo -e 'WebBrowser=firefox' >> "${file}"
-
-
-##### Setup firefox's plugins
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}firefox's plugins${RESET} ~ useful addons"
-#--- Configure firefox
-export DISPLAY=:0.0
-#--- Download extensions
-ffpath="$(find ~/.mozilla/firefox/*.default*/ -maxdepth 0 -mindepth 0 -type d -name '*.default*' -print -quit)/extensions"
-[ "${ffpath}" == "/extensions" ] \
-  && echo -e ' '${RED}'[!]'${RESET}" Couldn't find Firefox folder" 1>&2
-mkdir -p "${ffpath}/"
-#--- plug-n-hack
-#curl --progress -k -L -f "https://github.com/mozmark/ringleader/blob/master/fx_pnh.xpi?raw=true????????????????"  \
-#  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'plug-n-hack' 1>&2
-#--- HttpFox
-#curl --progress -k -L -f "https://addons.mozilla.org/en-GB/firefox/addon/httpfox/??????????????"  \
-#  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HttpFox' 1>&2
-#--- SQLite Manager
-echo -n '[1/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/5817/addon-5817-latest.xpi?src=dp-btn-primary" \
-  -o "${ffpath}/SQLiteManager@mrinalkant.blogspot.com.xpi" \
-    || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'SQLite Manager'" 1>&2
-#--- Cookies Manager+
-echo -n '[2/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/92079/addon-92079-latest.xpi?src=dp-btn-primary" \
-  -o "${ffpath}/{bb6bc1bb-f824-4702-90cd-35e2fb24f25d}.xpi" \
-    || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Cookies Manager+'" 1>&2
-#--- Firebug
-# echo -n '[3/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/1843/addon-1843-latest.xpi?src=dp-btn-primary" \
-#   -o "${ffpath}/firebug@software.joehewitt.com.xpi" \
-#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Firebug'" 1>&2
-#--- FoxyProxy Basic
-echo -n '[4/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/15023/addon-15023-latest.xpi?src=dp-btn-primary" \
-  -o "${ffpath}/foxyproxy-basic@eric.h.jung.xpi" \
-    || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'FoxyProxy Basic'" 1>&2
-#--- User Agent Overrider
-# echo -n '[5/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/429678/addon-429678-latest.xpi?src=dp-btn-primary" \
-#   -o "${ffpath}/useragentoverrider@qixinglu.com.xpi" \
-#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'User Agent Overrider'" 1>&2
-#--- HTTPS Everywhere
-echo -n '[6/11]'; timeout 300 curl --progress -k -L -f "https://www.eff.org/files/https-everywhere-latest.xpi" \
-  -o "${ffpath}/https-everywhere@eff.org.xpi" \
-    || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HTTPS Everywhere'" 1>&2
-#--- Live HTTP Headers
-# echo -n '[7/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/3829/addon-3829-latest.xpi?src=dp-btn-primary" \
-#   -o "${ffpath}/{8f8fe09b-0bd3-4470-bc1b-8cad42b8203a}.xpi" \
-#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Live HTTP Headers'" 1>&2
-#---Tamper Data
-# echo -n '[8/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/966/addon-966-latest.xpi?src=dp-btn-primary" \
-#   -o "${ffpath}/{9c51bd27-6ed8-4000-a2bf-36cb95c0c947}.xpi" \
-#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Tamper Data'" 1>&2
-#--- Disable Add-on Compatibility Checks
-echo -n '[9/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/300254/addon-300254-latest.xpi?src=dp-btn-primary" \
-  -o "${ffpath}/check-compatibility@dactyl.googlecode.com.xpi" \
-    || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Disable Add-on Compatibility Checks'" 1>&2
-#--- Disable HackBar
-echo -n '[10/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/3899/addon-3899-latest.xpi?src=dp-btn-primary" \
-  -o "${ffpath}/{F5DDF39C-9293-4d5e-9AA8-E04E6DD5E9B4}.xpi" \
-    || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HackBar'" 1>&2
-#--- uBlock
-echo -n '[11/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/607454/addon-607454-latest.xpi?src=dp-btn-primary" \
-  -o "${ffpath}/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}.xpi" \
-    || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'uBlock'" 1>&2
-#--- Installing extensions
-for FILE in $(find "${ffpath}" -maxdepth 1 -type f -name '*.xpi'); do
-  d="$(basename "${FILE}" .xpi)"
-  mkdir -p "${ffpath}/${d}/"
-  unzip -q -o -d "${ffpath}/${d}/" "${FILE}"
-  rm -f "${FILE}"
-done
-#--- Enable Firefox's addons/plugins/extensions
-timeout 15 firefox >/dev/null 2>&1
-timeout 5 killall -9 -q -w firefox-esr >/dev/null
-sleep 3s
-#--- Method #1 (Works on older versions)
-file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.sqlite' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
-if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
-  echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #1 - extensions.sqlite)"
-  apt -y -qq install sqlite3 \
-    || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-  rm -f /tmp/firefox.sql
-  touch /tmp/firefox.sql
-  echo "UPDATE 'main'.'addon' SET 'active' = 1, 'userDisabled' = 0;" > /tmp/firefox.sql    # Force them all!
-  sqlite3 "${file}" < /tmp/firefox.sql      #fuser extensions.sqlite
-fi
-#--- Method #2 (Newer versions)
-file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.json' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
-if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
-  echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #2 - extensions.json)"
-  sed -i 's/"active":false,/"active":true,/g' "${file}"                # Force them all!
-  sed -i 's/"userDisabled":true,/"userDisabled":false,/g' "${file}"    # Force them all!
-fi
-#--- Remove cache
-file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'prefs.js' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup} #TODO don't find this folder
-[ -n "${file}" ] \
-  && sed -i '/extensions.installCache/d' "${file}"
-#--- For extensions that just work without restarting
-timeout 15 firefox >/dev/null 2>&1
-timeout 5 killall -9 -q -w firefox-esr >/dev/null
-sleep 3s
-#--- For (most) extensions, as they need firefox to restart
-timeout 15 firefox >/dev/null 2>&1
-timeout 5 killall -9 -q -w firefox-esr >/dev/null
-sleep 5s
-#--- Wipe session (due to force close)
-find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'sessionstore.*' -delete
-#--- Configure foxyproxy
-file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'foxyproxy.xml' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
-if [[ -z "${file}" ]]; then
-  echo -e ' '${RED}'[!]'${RESET}' Something went wrong with the FoxyProxy firefox extension (did any extensions install?). Skipping...' 1>&2 #TODO Trigger here
-else     # Create new
-  echo -ne '<?xml version="1.0" encoding="UTF-8"?>\n<foxyproxy mode="disabled" selectedTabIndex="0" toolbaricon="true" toolsMenu="true" contextMenu="false" advancedMenus="false" previousMode="disabled" resetIconColors="true" useStatusBarPrefix="true" excludePatternsFromCycling="false" excludeDisabledFromCycling="false" ignoreProxyScheme="false" apiDisabled="false" proxyForVersionCheck=""><random includeDirect="false" includeDisabled="false"/><statusbar icon="true" text="false" left="options" middle="cycle" right="contextmenu" width="0"/><toolbar left="options" middle="cycle" right="contextmenu"/><logg enabled="false" maxSize="500" noURLs="false" header="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;\n&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;&lt;head&gt;&lt;title&gt;&lt;/title&gt;&lt;link rel=&quot;icon&quot; href=&quot;http://getfoxyproxy.org/favicon.ico&quot;/&gt;&lt;link rel=&quot;shortcut icon&quot; href=&quot;http://getfoxyproxy.org/favicon.ico&quot;/&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;http://getfoxyproxy.org/styles/log.css&quot; type=&quot;text/css&quot;/&gt;&lt;/head&gt;&lt;body&gt;&lt;table class=&quot;log-table&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;td class=&quot;heading&quot;&gt;${timestamp-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${url-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${proxy-name-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${proxy-notes-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-name-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-case-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-type-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-color-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pac-result-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${error-msg-heading}&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tfoot&gt;&lt;tr&gt;&lt;td/&gt;&lt;/tr&gt;&lt;/tfoot&gt;&lt;tbody&gt;" row="&lt;tr&gt;&lt;td class=&quot;timestamp&quot;&gt;${timestamp}&lt;/td&gt;&lt;td class=&quot;url&quot;&gt;&lt;a href=&quot;${url}&quot;&gt;${url}&lt;/a&gt;&lt;/td&gt;&lt;td class=&quot;proxy-name&quot;&gt;${proxy-name}&lt;/td&gt;&lt;td class=&quot;proxy-notes&quot;&gt;${proxy-notes}&lt;/td&gt;&lt;td class=&quot;pattern-name&quot;&gt;${pattern-name}&lt;/td&gt;&lt;td class=&quot;pattern&quot;&gt;${pattern}&lt;/td&gt;&lt;td class=&quot;pattern-case&quot;&gt;${pattern-case}&lt;/td&gt;&lt;td class=&quot;pattern-type&quot;&gt;${pattern-type}&lt;/td&gt;&lt;td class=&quot;pattern-color&quot;&gt;${pattern-color}&lt;/td&gt;&lt;td class=&quot;pac-result&quot;&gt;${pac-result}&lt;/td&gt;&lt;td class=&quot;error-msg&quot;&gt;${error-msg}&lt;/td&gt;&lt;/tr&gt;" footer="&lt;/tbody&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;"/><warnings/><autoadd enabled="false" temp="false" reload="true" notify="true" notifyWhenCanceled="true" prompt="true"><match enabled="true" name="Dynamic AutoAdd Pattern" pattern="*://${3}${6}/*" isRegEx="false" isBlackList="false" isMultiLine="false" caseSensitive="false" fromSubscription="false"/><match enabled="true" name="" pattern="*You are not authorized to view this page*" isRegEx="false" isBlackList="false" isMultiLine="true" caseSensitive="false" fromSubscription="false"/></autoadd><quickadd enabled="false" temp="false" reload="true" notify="true" notifyWhenCanceled="true" prompt="true"><match enabled="true" name="Dynamic QuickAdd Pattern" pattern="*://${3}${6}/*" isRegEx="false" isBlackList="false" isMultiLine="false" caseSensitive="false" fromSubscription="false"/></quickadd><defaultPrefs origPrefetch="null"/><proxies>' > "${file}"
-  echo -ne '<proxy name="localhost:8080" id="1145138293" notes="e.g. Burp, w3af" fromSubscription="false" enabled="true" mode="manual" selectedTabIndex="0" lastresort="false" animatedIcons="true" includeInCycle="false" color="#07753E" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="true" disableCache="true" clearCookiesBeforeUse="false" rejectCookies="false"><matches/><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="127.0.0.1" port="8080" socksversion="5" isSocks="false" username="" password="" domain=""/></proxy>' >> "${file}"
-  echo -ne '<proxy name="localhost:8081 (socket5)" id="212586674" notes="e.g. SSH" fromSubscription="false" enabled="true" mode="manual" selectedTabIndex="0" lastresort="false" animatedIcons="true" includeInCycle="false" color="#917504" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="true" disableCache="true" clearCookiesBeforeUse="false" rejectCookies="false"><matches/><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="127.0.0.1" port="8081" socksversion="5" isSocks="true" username="" password="" domain=""/></proxy>' >> "${file}"
-  echo -ne '<proxy name="No Caching" id="3884644610" notes="" fromSubscription="false" enabled="true" mode="system" selectedTabIndex="0" lastresort="false" animatedIcons="true" includeInCycle="false" color="#990DA6" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="true" disableCache="true" clearCookiesBeforeUse="false" rejectCookies="false"><matches/><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="" port="" socksversion="5" isSocks="false" username="" password="" domain=""/></proxy>' >> "${file}"
-  echo -ne '<proxy name="Default" id="3377581719" notes="" fromSubscription="false" enabled="true" mode="direct" selectedTabIndex="0" lastresort="true" animatedIcons="false" includeInCycle="true" color="#0055E5" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="false" disableCache="false" clearCookiesBeforeUse="false" rejectCookies="false"><matches><match enabled="true" name="All" pattern="*" isRegEx="false" isBlackList="false" isMultiLine="false" caseSensitive="false" fromSubscription="false"/></matches><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="" port="" socksversion="5" isSocks="false" username="" password=""/></proxy>' >> "${file}"
-  echo -e '</proxies></foxyproxy>' >> "${file}"
-fi
+# (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}firefox${RESET} ~ GUI web browser"
+# apt -y -qq install unzip curl firefox-esr \
+#   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+# #--- Configure firefox
+# export DISPLAY=:0.0
+# timeout 20 firefox >/dev/null 2>&1                # Start and kill. Files needed for first time run
+# timeout 5 killall -9 -q -w firefox-esr >/dev/null
+# file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'prefs.js' -print -quit)
+# [ -e "${file}" ] \
+#   && cp -n $file{,.bkup}   #/etc/firefox-esr/pref/*.js #TODO sed don't find theses lines
+# ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+# sed -i 's/^.network.proxy.socks_remote_dns.*/user_pref("network.proxy.socks_remote_dns", true);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("network.proxy.socks_remote_dns", true);' >> "${file}"
+# sed -i 's/^.browser.safebrowsing.enabled.*/user_pref("browser.safebrowsing.enabled", false);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("browser.safebrowsing.enabled", false);' >> "${file}"
+# sed -i 's/^.browser.safebrowsing.malware.enabled.*/user_pref("browser.safebrowsing.malware.enabled", false);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("browser.safebrowsing.malware.enabled", false);' >> "${file}"
+# sed -i 's/^.browser.safebrowsing.remoteLookups.enabled.*/user_pref("browser.safebrowsing.remoteLookups.enabled", false);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("browser.safebrowsing.remoteLookups.enabled", false);' >> "${file}"
+# sed -i 's/^.*browser.startup.page.*/user_pref("browser.startup.page", 0);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("browser.startup.page", 0);' >> "${file}"
+# sed -i 's/^.*privacy.donottrackheader.enabled.*/user_pref("privacy.donottrackheader.enabled", true);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("privacy.donottrackheader.enabled", true);' >> "${file}"
+# sed -i 's/^.*browser.showQuitWarning.*/user_pref("browser.showQuitWarning", true);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("browser.showQuitWarning", true);' >> "${file}"
+# sed -i 's/^.*extensions.https_everywhere._observatory.popup_shown.*/user_pref("extensions.https_everywhere._observatory.popup_shown", true);' "${file}" 2>/dev/null \
+#   || echo 'user_pref("extensions.https_everywhere._observatory.popup_shown", true);' >> "${file}"
+# sed -i 's/^.network.security.ports.banned.override/user_pref("network.security.ports.banned.override", "1-65455");' "${file}" 2>/dev/null \
+#   || echo 'user_pref("network.security.ports.banned.override", "1-65455");' >> "${file}"
+# #--- Replace bookmarks (base: http://pentest-bookmarks.googlecode.com)
+# file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'bookmarks.html' -print -quit) #TODO don't find thise folder
+# [ -e "${file}" ] \
+#   && cp -n $file{,.bkup}   #/etc/firefox-esr/profile/bookmarks.html
+# #timeout 300 curl --progress -k -L -f "http://pentest-bookmarks.googlecode.com/files/bookmarksv1.5.html" > /tmp/bookmarks_new.html \
+# #  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading bookmarks_new.html" 1>&2      #***!!! hardcoded version! Need to manually check for updates
+# #--- Configure bookmarks
+# #awk '!a[$0]++' /tmp/bookmarks_new.html \
+# #  | \egrep -v ">(Latest Headlines|Getting Started|Recently Bookmarked|Recent Tags|Mozilla Firefox|Help and Tutorials|Customize Firefox|Get Involved|About Us|Hacker Media|Bookmarks Toolbar|Most Visited)</" \
+# #  | \egrep -v "^    </DL><p>" \
+# #  | \egrep -v "^<DD>Add" > "${file}"
+# sed -i 's#^</DL><p>#        </DL><p>\n    </DL><p>\n</DL><p>#' "${file}"                                          # Fix import issues from pentest-bookmarks...
+# sed -i 's#^    <DL><p>#    <DL><p>\n    <DT><A HREF="http://127.0.0.1/">localhost</A>#' "${file}"                 # Add localhost to bookmark toolbar (before hackery folder)
+# sed -i 's#^    <DL><p>#    <DL><p>\n    <DT><A HREF="file:///var/www/html/cyberchef.htm">CyberChef</A>#' "${file}"                 # Add CyberChef application
+# # sed -i 's#^</DL><p>#    <DT><A HREF="https://127.0.0.1:8834/">Nessus</A>\n</DL><p>#' "${file}"                    # Add Nessus UI bookmark toolbar
+# # [ "${openVAS}" != "false" ] \
+# #   && sed -i 's#^</DL><p>#    <DT><A HREF="https://127.0.0.1:9392/">OpenVAS</A>\n</DL><p>#' "${file}"              # Add OpenVAS UI to bookmark toolbar
+# # sed -i 's#^</DL><p>#    <DT><A HREF="http://127.0.0.1:3000/ui/panel">BeEF</A>\n</DL><p>#' "${file}"               # Add BeEF UI to bookmark toolbar
+# sed -i 's#^</DL><p>#    <DT><A HREF="http://127.0.0.1/rips/">RIPS</A>\n</DL><p>#' "${file}"                       # Add RIPs to bookmark toolbar
+# sed -i 's#^</DL><p>#    <DT><A HREF="https://paulschou.com/tools/xlate/">XLATE</A>\n</DL><p>#' "${file}"          # Add XLATE to bookmark toolbar
+# # sed -i 's#^</DL><p>#    <DT><A HREF="https://hackvertor.co.uk/public">HackVertor</A>\n</DL><p>#' "${file}"        # Add HackVertor to bookmark toolbar
+# # sed -i 's#^</DL><p>#    <DT><A HREF="http://www.irongeek.com/skiddypad.php">SkiddyPad</A>\n</DL><p>#' "${file}"   # Add Skiddypad to bookmark toolbar
+# sed -i 's#^</DL><p>#    <DT><A HREF="https://www.exploit-db.com/search/">Exploit-DB</A>\n</DL><p>#' "${file}"     # Add Exploit-DB to bookmark toolbar
+# sed -i 's#^</DL><p>#    <DT><A HREF="http://offset-db.com/">Offset-DB</A>\n</DL><p>#' "${file}"                   # Add Offset-DB to bookmark toolbar
+# # sed -i 's#^</DL><p>#    <DT><A HREF="http://shell-storm.org/shellcode/">Shelcodes</A>\n</DL><p>#' "${file}"       # Add Shelcodes to bookmark toolbar
+# # sed -i 's#^</DL><p>#    <DT><A HREF="http://ropshell.com/">ROP Shell</A>\n</DL><p>#' "${file}"                    # Add ROP Shell to bookmark toolbar
+# sed -i 's#^</DL><p>#    <DT><A HREF="https://ifconfig.io/">ifconfig</A>\n</DL><p>#' "${file}"                     # Add ifconfig.io to bookmark toolbar
+# sed -i 's#<HR>#<DT><H3 ADD_DATE="1303667175" LAST_MODIFIED="1303667175" PERSONAL_TOOLBAR_FOLDER="true">Bookmarks Toolbar</H3>\n<DD>Add bookmarks to this folder to see them displayed on the Bookmarks Toolbar#' "${file}"
+# #--- Clear bookmark cache
+# find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -mindepth 1 -type f -name "places.sqlite" -delete
+# find ~/.mozilla/firefox/*.default*/bookmarkbackups/ -type f -delete
+# #--- Set firefox for XFCE's default
+# mkdir -p ~/.config/xfce4/
+# file=~/.config/xfce4/helpers.rc; [ -e "${file}" ] && cp -n $file{,.bkup}    #exo-preferred-applications   #xdg-mime default
+# ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+# sed -i 's#^WebBrowser=.*#WebBrowser=firefox#' "${file}" 2>/dev/null \
+#   || echo -e 'WebBrowser=firefox' >> "${file}"
+#
+#
+# ##### Setup firefox's plugins
+# (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}firefox's plugins${RESET} ~ useful addons"
+# #--- Configure firefox
+# export DISPLAY=:0.0
+# #--- Download extensions
+# ffpath="$(find ~/.mozilla/firefox/*.default*/ -maxdepth 0 -mindepth 0 -type d -name '*.default*' -print -quit)/extensions"
+# [ "${ffpath}" == "/extensions" ] \
+#   && echo -e ' '${RED}'[!]'${RESET}" Couldn't find Firefox folder" 1>&2
+# mkdir -p "${ffpath}/"
+# #--- plug-n-hack
+# #curl --progress -k -L -f "https://github.com/mozmark/ringleader/blob/master/fx_pnh.xpi?raw=true????????????????"  \
+# #  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'plug-n-hack' 1>&2
+# #--- HttpFox
+# #curl --progress -k -L -f "https://addons.mozilla.org/en-GB/firefox/addon/httpfox/??????????????"  \
+# #  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HttpFox' 1>&2
+# #--- SQLite Manager
+# echo -n '[1/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/5817/addon-5817-latest.xpi?src=dp-btn-primary" \
+#   -o "${ffpath}/SQLiteManager@mrinalkant.blogspot.com.xpi" \
+#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'SQLite Manager'" 1>&2
+# #--- Cookies Manager+
+# echo -n '[2/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/92079/addon-92079-latest.xpi?src=dp-btn-primary" \
+#   -o "${ffpath}/{bb6bc1bb-f824-4702-90cd-35e2fb24f25d}.xpi" \
+#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Cookies Manager+'" 1>&2
+# #--- Firebug
+# # echo -n '[3/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/1843/addon-1843-latest.xpi?src=dp-btn-primary" \
+# #   -o "${ffpath}/firebug@software.joehewitt.com.xpi" \
+# #     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Firebug'" 1>&2
+# #--- FoxyProxy Basic
+# echo -n '[4/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/15023/addon-15023-latest.xpi?src=dp-btn-primary" \
+#   -o "${ffpath}/foxyproxy-basic@eric.h.jung.xpi" \
+#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'FoxyProxy Basic'" 1>&2
+# #--- User Agent Overrider
+# # echo -n '[5/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/429678/addon-429678-latest.xpi?src=dp-btn-primary" \
+# #   -o "${ffpath}/useragentoverrider@qixinglu.com.xpi" \
+# #     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'User Agent Overrider'" 1>&2
+# #--- HTTPS Everywhere
+# echo -n '[6/11]'; timeout 300 curl --progress -k -L -f "https://www.eff.org/files/https-everywhere-latest.xpi" \
+#   -o "${ffpath}/https-everywhere@eff.org.xpi" \
+#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HTTPS Everywhere'" 1>&2
+# #--- Live HTTP Headers
+# # echo -n '[7/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/3829/addon-3829-latest.xpi?src=dp-btn-primary" \
+# #   -o "${ffpath}/{8f8fe09b-0bd3-4470-bc1b-8cad42b8203a}.xpi" \
+# #     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Live HTTP Headers'" 1>&2
+# #---Tamper Data
+# # echo -n '[8/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/966/addon-966-latest.xpi?src=dp-btn-primary" \
+# #   -o "${ffpath}/{9c51bd27-6ed8-4000-a2bf-36cb95c0c947}.xpi" \
+# #     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Tamper Data'" 1>&2
+# #--- Disable Add-on Compatibility Checks
+# echo -n '[9/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/300254/addon-300254-latest.xpi?src=dp-btn-primary" \
+#   -o "${ffpath}/check-compatibility@dactyl.googlecode.com.xpi" \
+#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'Disable Add-on Compatibility Checks'" 1>&2
+# #--- Disable HackBar
+# echo -n '[10/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/3899/addon-3899-latest.xpi?src=dp-btn-primary" \
+#   -o "${ffpath}/{F5DDF39C-9293-4d5e-9AA8-E04E6DD5E9B4}.xpi" \
+#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'HackBar'" 1>&2
+# #--- uBlock
+# echo -n '[11/11]'; timeout 300 curl --progress -k -L -f "https://addons.mozilla.org/firefox/downloads/latest/607454/addon-607454-latest.xpi?src=dp-btn-primary" \
+#   -o "${ffpath}/{ec8030f7-c20a-464f-9b0e-13a3a9e97384}.xpi" \
+#     || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 'uBlock'" 1>&2
+# #--- Installing extensions
+# for FILE in $(find "${ffpath}" -maxdepth 1 -type f -name '*.xpi'); do
+#   d="$(basename "${FILE}" .xpi)"
+#   mkdir -p "${ffpath}/${d}/"
+#   unzip -q -o -d "${ffpath}/${d}/" "${FILE}"
+#   rm -f "${FILE}"
+# done
+# #--- Enable Firefox's addons/plugins/extensions
+# timeout 15 firefox >/dev/null 2>&1
+# timeout 5 killall -9 -q -w firefox-esr >/dev/null
+# sleep 3s
+# #--- Method #1 (Works on older versions)
+# file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.sqlite' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
+# if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
+#   echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #1 - extensions.sqlite)"
+#   apt -y -qq install sqlite3 \
+#     || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+#   rm -f /tmp/firefox.sql
+#   touch /tmp/firefox.sql
+#   echo "UPDATE 'main'.'addon' SET 'active' = 1, 'userDisabled' = 0;" > /tmp/firefox.sql    # Force them all!
+#   sqlite3 "${file}" < /tmp/firefox.sql      #fuser extensions.sqlite
+# fi
+# #--- Method #2 (Newer versions)
+# file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'extensions.json' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
+# if [[ -e "${file}" ]] || [[ -n "${file}" ]]; then
+#   echo -e " ${YELLOW}[i]${RESET} Enabled ${YELLOW}Firefox's extensions${RESET} (via method #2 - extensions.json)"
+#   sed -i 's/"active":false,/"active":true,/g' "${file}"                # Force them all!
+#   sed -i 's/"userDisabled":true,/"userDisabled":false,/g' "${file}"    # Force them all!
+# fi
+# #--- Remove cache
+# file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'prefs.js' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup} #TODO don't find this folder
+# [ -n "${file}" ] \
+#   && sed -i '/extensions.installCache/d' "${file}"
+# #--- For extensions that just work without restarting
+# timeout 15 firefox >/dev/null 2>&1
+# timeout 5 killall -9 -q -w firefox-esr >/dev/null
+# sleep 3s
+# #--- For (most) extensions, as they need firefox to restart
+# timeout 15 firefox >/dev/null 2>&1
+# timeout 5 killall -9 -q -w firefox-esr >/dev/null
+# sleep 5s
+# #--- Wipe session (due to force close)
+# find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'sessionstore.*' -delete
+# #--- Configure foxyproxy
+# file=$(find ~/.mozilla/firefox/*.default*/ -maxdepth 1 -type f -name 'foxyproxy.xml' -print -quit)   #&& [ -e "${file}" ] && cp -n $file{,.bkup}
+# if [[ -z "${file}" ]]; then
+#   echo -e ' '${RED}'[!]'${RESET}' Something went wrong with the FoxyProxy firefox extension (did any extensions install?). Skipping...' 1>&2 #TODO Trigger here
+# else     # Create new
+#   echo -ne '<?xml version="1.0" encoding="UTF-8"?>\n<foxyproxy mode="disabled" selectedTabIndex="0" toolbaricon="true" toolsMenu="true" contextMenu="false" advancedMenus="false" previousMode="disabled" resetIconColors="true" useStatusBarPrefix="true" excludePatternsFromCycling="false" excludeDisabledFromCycling="false" ignoreProxyScheme="false" apiDisabled="false" proxyForVersionCheck=""><random includeDirect="false" includeDisabled="false"/><statusbar icon="true" text="false" left="options" middle="cycle" right="contextmenu" width="0"/><toolbar left="options" middle="cycle" right="contextmenu"/><logg enabled="false" maxSize="500" noURLs="false" header="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;\n&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;\n&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;&lt;head&gt;&lt;title&gt;&lt;/title&gt;&lt;link rel=&quot;icon&quot; href=&quot;http://getfoxyproxy.org/favicon.ico&quot;/&gt;&lt;link rel=&quot;shortcut icon&quot; href=&quot;http://getfoxyproxy.org/favicon.ico&quot;/&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;http://getfoxyproxy.org/styles/log.css&quot; type=&quot;text/css&quot;/&gt;&lt;/head&gt;&lt;body&gt;&lt;table class=&quot;log-table&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;td class=&quot;heading&quot;&gt;${timestamp-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${url-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${proxy-name-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${proxy-notes-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-name-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-case-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-type-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pattern-color-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${pac-result-heading}&lt;/td&gt;&lt;td class=&quot;heading&quot;&gt;${error-msg-heading}&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tfoot&gt;&lt;tr&gt;&lt;td/&gt;&lt;/tr&gt;&lt;/tfoot&gt;&lt;tbody&gt;" row="&lt;tr&gt;&lt;td class=&quot;timestamp&quot;&gt;${timestamp}&lt;/td&gt;&lt;td class=&quot;url&quot;&gt;&lt;a href=&quot;${url}&quot;&gt;${url}&lt;/a&gt;&lt;/td&gt;&lt;td class=&quot;proxy-name&quot;&gt;${proxy-name}&lt;/td&gt;&lt;td class=&quot;proxy-notes&quot;&gt;${proxy-notes}&lt;/td&gt;&lt;td class=&quot;pattern-name&quot;&gt;${pattern-name}&lt;/td&gt;&lt;td class=&quot;pattern&quot;&gt;${pattern}&lt;/td&gt;&lt;td class=&quot;pattern-case&quot;&gt;${pattern-case}&lt;/td&gt;&lt;td class=&quot;pattern-type&quot;&gt;${pattern-type}&lt;/td&gt;&lt;td class=&quot;pattern-color&quot;&gt;${pattern-color}&lt;/td&gt;&lt;td class=&quot;pac-result&quot;&gt;${pac-result}&lt;/td&gt;&lt;td class=&quot;error-msg&quot;&gt;${error-msg}&lt;/td&gt;&lt;/tr&gt;" footer="&lt;/tbody&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;"/><warnings/><autoadd enabled="false" temp="false" reload="true" notify="true" notifyWhenCanceled="true" prompt="true"><match enabled="true" name="Dynamic AutoAdd Pattern" pattern="*://${3}${6}/*" isRegEx="false" isBlackList="false" isMultiLine="false" caseSensitive="false" fromSubscription="false"/><match enabled="true" name="" pattern="*You are not authorized to view this page*" isRegEx="false" isBlackList="false" isMultiLine="true" caseSensitive="false" fromSubscription="false"/></autoadd><quickadd enabled="false" temp="false" reload="true" notify="true" notifyWhenCanceled="true" prompt="true"><match enabled="true" name="Dynamic QuickAdd Pattern" pattern="*://${3}${6}/*" isRegEx="false" isBlackList="false" isMultiLine="false" caseSensitive="false" fromSubscription="false"/></quickadd><defaultPrefs origPrefetch="null"/><proxies>' > "${file}"
+#   echo -ne '<proxy name="localhost:8080" id="1145138293" notes="e.g. Burp, w3af" fromSubscription="false" enabled="true" mode="manual" selectedTabIndex="0" lastresort="false" animatedIcons="true" includeInCycle="false" color="#07753E" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="true" disableCache="true" clearCookiesBeforeUse="false" rejectCookies="false"><matches/><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="127.0.0.1" port="8080" socksversion="5" isSocks="false" username="" password="" domain=""/></proxy>' >> "${file}"
+#   echo -ne '<proxy name="localhost:8081 (socket5)" id="212586674" notes="e.g. SSH" fromSubscription="false" enabled="true" mode="manual" selectedTabIndex="0" lastresort="false" animatedIcons="true" includeInCycle="false" color="#917504" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="true" disableCache="true" clearCookiesBeforeUse="false" rejectCookies="false"><matches/><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="127.0.0.1" port="8081" socksversion="5" isSocks="true" username="" password="" domain=""/></proxy>' >> "${file}"
+#   echo -ne '<proxy name="No Caching" id="3884644610" notes="" fromSubscription="false" enabled="true" mode="system" selectedTabIndex="0" lastresort="false" animatedIcons="true" includeInCycle="false" color="#990DA6" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="true" disableCache="true" clearCookiesBeforeUse="false" rejectCookies="false"><matches/><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="" port="" socksversion="5" isSocks="false" username="" password="" domain=""/></proxy>' >> "${file}"
+#   echo -ne '<proxy name="Default" id="3377581719" notes="" fromSubscription="false" enabled="true" mode="direct" selectedTabIndex="0" lastresort="true" animatedIcons="false" includeInCycle="true" color="#0055E5" proxyDNS="true" noInternalIPs="false" autoconfMode="pac" clearCacheBeforeUse="false" disableCache="false" clearCookiesBeforeUse="false" rejectCookies="false"><matches><match enabled="true" name="All" pattern="*" isRegEx="false" isBlackList="false" isMultiLine="false" caseSensitive="false" fromSubscription="false"/></matches><autoconf url="" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><autoconf url="http://wpad/wpad.dat" loadNotification="true" errorNotification="true" autoReload="false" reloadFreqMins="60" disableOnBadPAC="true"/><manualconf host="" port="" socksversion="5" isSocks="false" username="" password=""/></proxy>' >> "${file}"
+#   echo -e '</proxies></foxyproxy>' >> "${file}"
+# fi
 
 ##### Install cyberchef
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CyberChef${RESET} ~ Conversion WebApp"
@@ -1596,156 +1596,157 @@ if [ -e /tmp/boostnote.deb ]; then
   dpkg -i /tmp/boostnote.deb \
   || echo -e ' '${RED}'[!] Issue with Boostnote install'${RESET} 1>&2
 fi
-##### Install conky
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}conky${RESET} ~ GUI desktop monitor"
-export DISPLAY=:0.0
-apt -y -qq install conky \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-#--- Configure conky
-file=~/.conkyrc; [ -e "${file}" ] && cp -n $file{,.bkup}
-if [[ -f "${file}" ]]; then
-  echo -e ' '${RED}'[!]'${RESET}" ${file} detected. Skipping..." 1>&2
-else
-  cat <<EOF > "${file}"
---# Useful: http://forums.opensuse.org/english/get-technical-help-here/how-faq-forums/unreviewed-how-faq/464737-easy-configuring-conky-conkyconf.html
-conky.config = {
-    background = false,
 
-    font = 'monospace:size=8:weight=bold',
-    use_xft = true,
-
-    update_interval = 2.0,
-
-    own_window = true,
-    own_window_type = 'normal',
-    own_window_transparent = true,
-    own_window_class = 'conky-semi',
-    own_window_argb_visual = false,
-    own_window_colour = 'brown',
-    own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
-
-    double_buffer = true,
-    maximum_width = 260,
-
-    draw_shades = true,
-    draw_outline = false,
-    draw_borders = false,
-
-    stippled_borders = 3,
-    border_inner_margin = 9,
-    border_width = 10,
-
-    default_color = 'grey',
-
-    alignment = 'bottom_right',
-    gap_x = 5,
-    gap_y = 0,
-
-    uppercase = false,
-    use_spacer = 'right',
-};
-
-conky.text = [[
-\${color dodgerblue3}SYSTEM \${hr 2}\$color
-#\${color white}\${time %A},\${time %e} \${time %B} \${time %G}\${alignr}\${time %H:%M:%S}
-\${color white}Host\$color: \$nodename  \${alignr}\${color white}Uptime\$color: \$uptime
-
-\${color dodgerblue3}CPU \${hr 2}\$color
-#\${font Arial:bold:size=8}\${execi 99999 grep "model name" -m1 /proc/cpuinfo | cut -d":" -f2 | cut -d" " -f2- | sed "s#Processor ##"}\$font\$color
-\${color white}MHz\$color: \${freq} \${alignr}\${color white}Load\$color: \${exec uptime | awk -F "load average: "  '{print \$2}'}
-\${color white}Tasks\$color: \$running_processes/\$processes \${alignr}\${color white}CPU0\$color: \${cpu cpu0}% \${color white}CPU1\$color: \${cpu cpu1}%
-#\${color #c0ff3e}\${acpitemp}C
-#\${execi 20 sensors |grep "Core0 Temp" | cut -d" " -f4}\$font\$color\${alignr}\${freq_g 2} \${execi 20 sensors |grep "Core1 Temp" | cut -d" " -f4}
-\${cpugraph cpu0 25,120 000000 white} \${alignr}\${cpugraph cpu1 25,120 000000 white}
-\${color white}\${cpubar cpu1 3,120} \${alignr}\${color white}\${cpubar cpu2 3,120}\$color
-
-\${color dodgerblue3}PROCESSES \${hr 2}\$color
-\${color white}NAME             PID     CPU     MEM
-\${color white}\${top name 1}\${top pid 1}  \${top cpu 1}  \${top mem 1}\$color
-\${top name 2}\${top pid 2}  \${top cpu 2}  \${top mem 2}
-\${top name 3}\${top pid 3}  \${top cpu 3}  \${top mem 3}
-\${top name 4}\${top pid 4}  \${top cpu 4}  \${top mem 4}
-\${top name 5}\${top pid 5}  \${top cpu 5}  \${top mem 5}
-
-\${color dodgerblue3}MEMORY & SWAP \${hr 2}\$color
-\${color white}RAM\$color  \$alignr\$memperc%  \${membar 6,170}\$color
-\${color white}Swap\$color  \$alignr\$swapperc%  \${swapbar 6,170}\$color
-
-\${color dodgerblue3}FILESYSTEM \${hr 2}\$color
-\${color white}root\$color \${fs_free_perc /}% free\${alignr}\${fs_free /}/ \${fs_size /}
-\${fs_bar 3 /}\$color
-#\${color white}home\$color \${fs_free_perc /home}% free\${alignr}\${fs_free /home}/ \${fs_size /home}
-#\${fs_bar 3 /home}\$color
-
-\${color dodgerblue3}LAN eth0 (\${addr eth0}) \${hr 2}\$color
-\${color white}Down\$color:  \${downspeed eth0} KB/s\${alignr}\${color white}Up\$color: \${upspeed eth0} KB/s
-\${color white}Downloaded\$color: \${totaldown eth0} \${alignr}\${color white}Uploaded\$color: \${totalup eth0}
-\${downspeedgraph eth0 25,120 000000 00ff00} \${alignr}\${upspeedgraph eth0 25,120 000000 ff0000}\$color
-
-EOF
-ip addr show eth1 &>/dev/null \
-  && cat <<EOF >> "${file}"
-\${color dodgerblue3}LAN eth1 (\${addr eth1}) \${hr 2}\$color
-\${color white}Down\$color:  \${downspeed eth1} KB/s\${alignr}\${color white}Up\$color: \${upspeed eth1} KB/s
-\${color white}Downloaded\$color: \${totaldown eth1} \${alignr}\${color white}Uploaded\$color: \${totalup eth1}
-\${downspeedgraph eth1 25,120 000000 00ff00} \${alignr}\${upspeedgraph eth1 25,120 000000 ff0000}\$color
-
-EOF
-cat <<EOF >> "${file}"
-\${color dodgerblue3}Wi-Fi (\${addr wlan0}) \${hr 2}\$color
-\${color white}Down\$color:  \${downspeed wlan0} KB/s\${alignr}\${color white}Up\$color: \${upspeed wlan0} KB/s
-\${color white}Downloaded\$color: \${totaldown wlan0} \${alignr}\${color white}Uploaded\$color: \${totalup wlan0}
-\${downspeedgraph wlan0 25,120 000000 00ff00} \${alignr}\${upspeedgraph wlan0 25,120 000000 ff0000}\$color
-
-\${color dodgerblue3}CONNECTIONS \${hr 2}\$color
-\${color white}Inbound: \$color\${tcp_portmon 1 32767 count}  \${alignc}\${color white}Outbound: \$color\${tcp_portmon 32768 61000 count}\${alignr}\${color white}Total: \$color\${tcp_portmon 1 65535 count}
-\${color white}Inbound \${alignr}Local Service/Port\$color
-\$color \${tcp_portmon 1 32767 rhost 0} \${alignr}\${tcp_portmon 1 32767 lservice 0}
-\$color \${tcp_portmon 1 32767 rhost 1} \${alignr}\${tcp_portmon 1 32767 lservice 1}
-\$color \${tcp_portmon 1 32767 rhost 2} \${alignr}\${tcp_portmon 1 32767 lservice 2}
-\${color white}Outbound \${alignr}Remote Service/Port\$color
-\$color \${tcp_portmon 32768 61000 rhost 0} \${alignr}\${tcp_portmon 32768 61000 rservice 0}
-\$color \${tcp_portmon 32768 61000 rhost 1} \${alignr}\${tcp_portmon 32768 61000 rservice 1}
-\$color \${tcp_portmon 32768 61000 rhost 2} \${alignr}\${tcp_portmon 32768 61000 rservice 2}
-]]
-EOF
-fi
-#--- Create start script
-mkdir -p /usr/local/bin/
-file=/usr/local/bin/start-conky; [ -e "${file}" ] && cp -n $file{,.bkup}
-cat <<EOF > "${file}" \
-  || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
-#!/bin/bash
-
-[[ -z \${DISPLAY} ]] && export DISPLAY=:0.0
-
-$(which timeout) 10 $(which killall) -9 -q -w conky
-$(which sleep) 20s
-$(which conky) &
-EOF
-chmod -f 0500 "${file}"
-#--- Run now
-bash /usr/local/bin/start-conky >/dev/null 2>&1 &
-#--- Add to startup (each login)
-mkdir -p ~/.config/autostart/
-file=~/.config/autostart/conkyscript.desktop; [ -e "${file}" ] && cp -n $file{,.bkup}
-cat <<EOF > "${file}" \
-  || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
-[Desktop Entry]
-Name=conky
-Exec=/usr/local/bin/start-conky
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-Type=Application
-Comment=
-EOF
-#--- Add keyboard shortcut (CTRL+r) to run the conky refresh script
-file=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml   #; [ -e "${file}" ] && cp -n $file{,.bkup}
-if [ -e "${file}" ]; then
-  grep -q '<property name="&lt;Primary&gt;r" type="string" value="/usr/local/bin/start-conky"/>' "${file}" \
-    || sed -i 's#<property name="\&lt;Alt\&gt;F2" type="string" value="xfrun4"/>#<property name="\&lt;Alt\&gt;F2" type="string" value="xfrun4"/>\n      <property name="\&lt;Primary\&gt;r" type="string" value="/usr/local/bin/start-conky"/>#' "${file}"
-fi
+# ##### Install conky
+# (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}conky${RESET} ~ GUI desktop monitor"
+# export DISPLAY=:0.0
+# apt -y -qq install conky \
+#   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+# #--- Configure conky
+# file=~/.conkyrc; [ -e "${file}" ] && cp -n $file{,.bkup}
+# if [[ -f "${file}" ]]; then
+#   echo -e ' '${RED}'[!]'${RESET}" ${file} detected. Skipping..." 1>&2
+# else
+#   cat <<EOF > "${file}"
+# --# Useful: http://forums.opensuse.org/english/get-technical-help-here/how-faq-forums/unreviewed-how-faq/464737-easy-configuring-conky-conkyconf.html
+# conky.config = {
+#     background = false,
+#
+#     font = 'monospace:size=8:weight=bold',
+#     use_xft = true,
+#
+#     update_interval = 2.0,
+#
+#     own_window = true,
+#     own_window_type = 'normal',
+#     own_window_transparent = true,
+#     own_window_class = 'conky-semi',
+#     own_window_argb_visual = false,
+#     own_window_colour = 'brown',
+#     own_window_hints = 'undecorated,below,sticky,skip_taskbar,skip_pager',
+#
+#     double_buffer = true,
+#     maximum_width = 260,
+#
+#     draw_shades = true,
+#     draw_outline = false,
+#     draw_borders = false,
+#
+#     stippled_borders = 3,
+#     border_inner_margin = 9,
+#     border_width = 10,
+#
+#     default_color = 'grey',
+#
+#     alignment = 'bottom_right',
+#     gap_x = 5,
+#     gap_y = 0,
+#
+#     uppercase = false,
+#     use_spacer = 'right',
+# };
+#
+# conky.text = [[
+# \${color dodgerblue3}SYSTEM \${hr 2}\$color
+# #\${color white}\${time %A},\${time %e} \${time %B} \${time %G}\${alignr}\${time %H:%M:%S}
+# \${color white}Host\$color: \$nodename  \${alignr}\${color white}Uptime\$color: \$uptime
+#
+# \${color dodgerblue3}CPU \${hr 2}\$color
+# #\${font Arial:bold:size=8}\${execi 99999 grep "model name" -m1 /proc/cpuinfo | cut -d":" -f2 | cut -d" " -f2- | sed "s#Processor ##"}\$font\$color
+# \${color white}MHz\$color: \${freq} \${alignr}\${color white}Load\$color: \${exec uptime | awk -F "load average: "  '{print \$2}'}
+# \${color white}Tasks\$color: \$running_processes/\$processes \${alignr}\${color white}CPU0\$color: \${cpu cpu0}% \${color white}CPU1\$color: \${cpu cpu1}%
+# #\${color #c0ff3e}\${acpitemp}C
+# #\${execi 20 sensors |grep "Core0 Temp" | cut -d" " -f4}\$font\$color\${alignr}\${freq_g 2} \${execi 20 sensors |grep "Core1 Temp" | cut -d" " -f4}
+# \${cpugraph cpu0 25,120 000000 white} \${alignr}\${cpugraph cpu1 25,120 000000 white}
+# \${color white}\${cpubar cpu1 3,120} \${alignr}\${color white}\${cpubar cpu2 3,120}\$color
+#
+# \${color dodgerblue3}PROCESSES \${hr 2}\$color
+# \${color white}NAME             PID     CPU     MEM
+# \${color white}\${top name 1}\${top pid 1}  \${top cpu 1}  \${top mem 1}\$color
+# \${top name 2}\${top pid 2}  \${top cpu 2}  \${top mem 2}
+# \${top name 3}\${top pid 3}  \${top cpu 3}  \${top mem 3}
+# \${top name 4}\${top pid 4}  \${top cpu 4}  \${top mem 4}
+# \${top name 5}\${top pid 5}  \${top cpu 5}  \${top mem 5}
+#
+# \${color dodgerblue3}MEMORY & SWAP \${hr 2}\$color
+# \${color white}RAM\$color  \$alignr\$memperc%  \${membar 6,170}\$color
+# \${color white}Swap\$color  \$alignr\$swapperc%  \${swapbar 6,170}\$color
+#
+# \${color dodgerblue3}FILESYSTEM \${hr 2}\$color
+# \${color white}root\$color \${fs_free_perc /}% free\${alignr}\${fs_free /}/ \${fs_size /}
+# \${fs_bar 3 /}\$color
+# #\${color white}home\$color \${fs_free_perc /home}% free\${alignr}\${fs_free /home}/ \${fs_size /home}
+# #\${fs_bar 3 /home}\$color
+#
+# \${color dodgerblue3}LAN eth0 (\${addr eth0}) \${hr 2}\$color
+# \${color white}Down\$color:  \${downspeed eth0} KB/s\${alignr}\${color white}Up\$color: \${upspeed eth0} KB/s
+# \${color white}Downloaded\$color: \${totaldown eth0} \${alignr}\${color white}Uploaded\$color: \${totalup eth0}
+# \${downspeedgraph eth0 25,120 000000 00ff00} \${alignr}\${upspeedgraph eth0 25,120 000000 ff0000}\$color
+#
+# EOF
+# ip addr show eth1 &>/dev/null \
+#   && cat <<EOF >> "${file}"
+# \${color dodgerblue3}LAN eth1 (\${addr eth1}) \${hr 2}\$color
+# \${color white}Down\$color:  \${downspeed eth1} KB/s\${alignr}\${color white}Up\$color: \${upspeed eth1} KB/s
+# \${color white}Downloaded\$color: \${totaldown eth1} \${alignr}\${color white}Uploaded\$color: \${totalup eth1}
+# \${downspeedgraph eth1 25,120 000000 00ff00} \${alignr}\${upspeedgraph eth1 25,120 000000 ff0000}\$color
+#
+# EOF
+# cat <<EOF >> "${file}"
+# \${color dodgerblue3}Wi-Fi (\${addr wlan0}) \${hr 2}\$color
+# \${color white}Down\$color:  \${downspeed wlan0} KB/s\${alignr}\${color white}Up\$color: \${upspeed wlan0} KB/s
+# \${color white}Downloaded\$color: \${totaldown wlan0} \${alignr}\${color white}Uploaded\$color: \${totalup wlan0}
+# \${downspeedgraph wlan0 25,120 000000 00ff00} \${alignr}\${upspeedgraph wlan0 25,120 000000 ff0000}\$color
+#
+# \${color dodgerblue3}CONNECTIONS \${hr 2}\$color
+# \${color white}Inbound: \$color\${tcp_portmon 1 32767 count}  \${alignc}\${color white}Outbound: \$color\${tcp_portmon 32768 61000 count}\${alignr}\${color white}Total: \$color\${tcp_portmon 1 65535 count}
+# \${color white}Inbound \${alignr}Local Service/Port\$color
+# \$color \${tcp_portmon 1 32767 rhost 0} \${alignr}\${tcp_portmon 1 32767 lservice 0}
+# \$color \${tcp_portmon 1 32767 rhost 1} \${alignr}\${tcp_portmon 1 32767 lservice 1}
+# \$color \${tcp_portmon 1 32767 rhost 2} \${alignr}\${tcp_portmon 1 32767 lservice 2}
+# \${color white}Outbound \${alignr}Remote Service/Port\$color
+# \$color \${tcp_portmon 32768 61000 rhost 0} \${alignr}\${tcp_portmon 32768 61000 rservice 0}
+# \$color \${tcp_portmon 32768 61000 rhost 1} \${alignr}\${tcp_portmon 32768 61000 rservice 1}
+# \$color \${tcp_portmon 32768 61000 rhost 2} \${alignr}\${tcp_portmon 32768 61000 rservice 2}
+# ]]
+# EOF
+# fi
+# #--- Create start script
+# mkdir -p /usr/local/bin/
+# file=/usr/local/bin/start-conky; [ -e "${file}" ] && cp -n $file{,.bkup}
+# cat <<EOF > "${file}" \
+#   || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
+# #!/bin/bash
+#
+# [[ -z \${DISPLAY} ]] && export DISPLAY=:0.0
+#
+# $(which timeout) 10 $(which killall) -9 -q -w conky
+# $(which sleep) 20s
+# $(which conky) &
+# EOF
+# chmod -f 0500 "${file}"
+# #--- Run now
+# bash /usr/local/bin/start-conky >/dev/null 2>&1 &
+# #--- Add to startup (each login)
+# mkdir -p ~/.config/autostart/
+# file=~/.config/autostart/conkyscript.desktop; [ -e "${file}" ] && cp -n $file{,.bkup}
+# cat <<EOF > "${file}" \
+#   || echo -e ' '${RED}'[!] Issue with writing file'${RESET} 1>&2
+# [Desktop Entry]
+# Name=conky
+# Exec=/usr/local/bin/start-conky
+# Hidden=false
+# NoDisplay=false
+# X-GNOME-Autostart-enabled=true
+# Type=Application
+# Comment=
+# EOF
+# #--- Add keyboard shortcut (CTRL+r) to run the conky refresh script
+# file=~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml   #; [ -e "${file}" ] && cp -n $file{,.bkup}
+# if [ -e "${file}" ]; then
+#   grep -q '<property name="&lt;Primary&gt;r" type="string" value="/usr/local/bin/start-conky"/>' "${file}" \
+#     || sed -i 's#<property name="\&lt;Alt\&gt;F2" type="string" value="xfrun4"/>#<property name="\&lt;Alt\&gt;F2" type="string" value="xfrun4"/>\n      <property name="\&lt;Primary\&gt;r" type="string" value="/usr/local/bin/start-conky"/>#' "${file}"
+# fi
 
 
 ##### Install metasploit ~ http://docs.kali.org/general-use/starting-metasploit-framework-in-kali
@@ -2365,7 +2366,7 @@ sed -i 's#^.*"Always use default editor".*#\t<Setting name="Always use default e
 apt -y -qq install zip unzip \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-#
+
 # ##### Install file roller
 # (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}file roller${RESET} ~ GUI file extractor"
 # apt -y -qq install file-roller \
@@ -2641,6 +2642,20 @@ popd >/dev/null
 apt -y -qq install webshells \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 ln -sf /opt/cmdsql-git /usr/share/webshells/aspx/cmdsql
+
+##### Install PownyShell
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}P0wny Shell${RESET} ~ web shell"
+apt -y -qq install git \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+git clone -q -b master https://github.com/flozz/p0wny-shell.git /opt/pownyshell-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/pownyshell-git/ >/dev/null
+git pull -q
+popd >/dev/null
+#--- Link to others
+apt -y -qq install webshells \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+ln -sf /opt/pownyshell-git /usr/share/webshells/php/p0wnyshell
 
 
 ##### Install JSP file browser

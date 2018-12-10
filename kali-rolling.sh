@@ -2259,8 +2259,11 @@ apt -y -qq install ca-certificates \
 
 ##### Install testssl
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}testssl${RESET} ~ Testing TLS/SSL encryption"
-apt -y -qq install testssl.sh \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+git clone -q --depth 1 https://github.com/drwetter/testssl.sh.git /opt/testssl-git/ \
+  || echo -e ' '${RED}'[!] Issue with git cloning'${RESET} 1>&2
+pushd /opt/testssl-git/ >/dev/null
+git pull -q
+popd >/dev/null
 
 
 ##### Install UACScript
@@ -3647,6 +3650,21 @@ host=localhost
 password=
 EOF
 
+##### Install GitTools
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}GitTools${RESET} ~ .git extractor"
+git clone -q -b master https://github.com/internetwache/GitTools /opt/gittools-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/gittools-git/ >/dev/null
+git pull -q
+popd >/dev/null
+
+##### Install SpiderFoot
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}SpiderFoot${RESET} ~ OSINT tool"
+git clone -q -b master https://github.com/smicallef/spiderfoot /opt/spiderfoot-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/spiderfoot-git/ >/dev/null
+git pull -q
+popd >/dev/null
 
 ##### Install rsh-client
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}rsh-client${RESET} ~ remote shell connections"

@@ -28,17 +28,13 @@ wget -qO kali-rolling.sh https://raw.githubusercontent.com/Chill3d/os-scripts/ma
   && bash kali-rolling.sh
 ################################################################################
 fi
-
 #-Defaults-------------------------------------------------------------#
-
 
 ##### Location information
 keyboardLayout="fr"           # Set keyboard layout                                       
 timezone="Europe/Paris"       # Set timezone location                                     
-
 ##### (Optional) Enable debug mode?
 #set -x
-
 ##### (Cosmetic) Colour output
 RED="\033[01;31m"      # Issues/Errors
 GREEN="\033[01;32m"    # Success
@@ -49,7 +45,6 @@ RESET="\033[00m"       # Normal
 
 STAGE=0                                                         # Where are we up to
 TOTAL=$( grep '(${STAGE}/${TOTAL})' $0 | wc -l );(( TOTAL-- ))  # How many things have we got todo
-
 
 ##### Check user inputs
 if [[ -n "${timezone}" && ! -f "/usr/share/zoneinfo/${timezone}" ]]; then
@@ -64,9 +59,7 @@ elif [[ -n "${keyboardLayout}" && -e /usr/share/X11/xkb/rules/xorg.lst ]]; then
   fi
 fi
 
-
 #-Start----------------------------------------------------------------#
-
 
 ##### Check if we are running as root - else this script will fail (hard!)
 if [[ "${EUID}" -ne 0 ]]; then
@@ -77,11 +70,9 @@ else
   echo -e " ${BLUE}[*]${RESET} ${BOLD}Kali Linux rolling post-install script${RESET}"
   sleep 3s
 fi
-
 ##### Fix display output for GUI programs (when connecting via SSH)
 export DISPLAY=:0.0
 export TERM=xterm
-
 
 ##### Are we using GNOME?
 if [[ $(which gnome-shell) ]]; then
@@ -89,8 +80,7 @@ if [[ $(which gnome-shell) ]]; then
   (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Disabling GNOME's ${GREEN}notification package updater${RESET} service ~ in case it runs during this script"
   export DISPLAY=:0.0
   timeout 5 killall -w /usr/lib/apt/methods/http >/dev/null 2>&1
-
-#   ##### Disable screensaver
+  #   ##### Disable screensaver
 #   (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Disabling ${GREEN}screensaver${RESET}"
 #   xset s 0 0
 #   xset s off
@@ -99,6 +89,13 @@ if [[ $(which gnome-shell) ]]; then
 #   echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping disabling package updater${RESET}..."
 fi
 
+##### Disable Touchscreen if there is one
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Disabling ${GREEN}Touchscreen${RESET} if there is one"
+apt -y -qq xinput \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+for id in `xinput --list|grep 'Touchscreen'|perl -ne 'while (m/id=(\d+)/g){print "$1\n";}'`; do
+  xinput disable $id
+fi
 
 ##### Check Internet access
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Checking ${GREEN}Internet access${RESET}"
@@ -118,7 +115,6 @@ fi
 timeout 300 curl --progress -k -L -f "https://kctbh9vrtdwd.statuspage.io/api/v2/status.json" | grep -q "All Systems Operational" \
   || (echo -e ' '${RED}'[!]'${RESET}" ${RED}GitHub is currently having issues${RESET}. ${BOLD}Lots may fail${RESET}. See: https://status.github.com/" 1>&2 \
     && exit 1)
-
 
 ##### Enable default network repositories ~ http://docs.kali.org/general-use/kali-linux-sources-list-repositories
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Enabling default OS ${GREEN}network repositories${RESET}"
@@ -140,7 +136,6 @@ if [[ "$?" -ne 0 ]]; then
   echo -e " ${YELLOW}[i]${RESET} Are the remote network repositories ${YELLOW}currently being sync'd${RESET}?"
   exit 1
 fi
-
 ##### Update location information - set either value to "" to skip.
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Updating ${GREEN}location information${RESET}"
 #--- Configure keyboard layout (location)
@@ -173,7 +168,6 @@ systemctl disable ntp 2>/dev/null
 #--- Only used for stats at the end
 start_time=$(date +%s)
 
-
 ##### Update OS from network repositories
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Updating OS${RESET} from network repositories"
 echo -e " ${YELLOW}[i]${RESET}  ...this ${BOLD}may take a while${RESET} depending on your Internet connection & Kali version/age"
@@ -197,7 +191,6 @@ if [[ "${_TMP}" -gt 1 ]]; then
   fi
 fi
 
-
 ##### Install kernel headers
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}kernel headers${RESET}"
 apt -y -qq install make gcc "linux-headers-$(uname -r)" \
@@ -210,7 +203,6 @@ if [[ $? -ne 0 ]]; then
   sleep 30s
 fi
 
-
 ##### Install "kali full" meta packages (default tool selection)
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}kali-linux-full${RESET} meta-package"
 echo -e " ${YELLOW}[i]${RESET}  ...this ${BOLD}may take a while${RESET} depending on your Kali version (e.g. ARM, light, mini or docker...)"
@@ -218,14 +210,12 @@ echo -e " ${YELLOW}[i]${RESET}  ...this ${BOLD}may take a while${RESET} dependin
 apt -y -qq install kali-linux-full \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-
 ##### Set audio level
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Setting ${GREEN}audio${RESET} levels"
 systemctl --user enable pulseaudio
 systemctl --user start pulseaudio
 pactl set-sink-mute 0 0
 pactl set-sink-volume 0 25%
-
 
 ##### Configure GRUB - Timeout + MAJ
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}GRUB${RESET} ~ boot manager"
@@ -258,7 +248,6 @@ else
   echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping GNOME${RESET}..." 1>&2
 fi
 
-
 ##### Install bash colour - all users
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}bash colour${RESET} ~ colours shell output"
 file=/etc/bash.bashrc; [ -e "${file}" ] && cp -n $file{,.bkup}   #~/.bashrc
@@ -279,7 +268,6 @@ grep -q "^alias l='ls $LS_OPTIONS -lA'" "${file}" 2>/dev/null \
   || echo "alias l='ls $LS_OPTIONS -lA'" >> "${file}"
 #--- Apply new configs
 source "${file}" || source ~/.zshrc
-
 
 ##### Install grc
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}grc${RESET} ~ colours shell output"
@@ -313,7 +301,6 @@ grep -q '^## grc wdiff alias' "${file}" 2>/dev/null \
 #--- Apply new aliases
 source "${file}" || source ~/.zshrc
 
-
 ##### Install bash completion - all users
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}bash completion${RESET} ~ tab complete CLI commands"
 apt -y -qq install bash-completion \
@@ -322,7 +309,6 @@ file=/etc/bash.bashrc; [ -e "${file}" ] && cp -n $file{,.bkup}   #~/.bashrc
 sed -i '/# enable bash completion in/,+7{/enable bash completion/!s/^#//}' "${file}"
 #--- Apply new configs
 source "${file}" || source ~/.zshrc
-
 
 ##### Configure aliases - root user
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configuring ${GREEN}aliases${RESET} ~ CLI shortcuts"
@@ -349,7 +335,6 @@ grep -q '^## strings' "${file}" 2>/dev/null \
   || echo -e '## strings\nalias strings="strings -a"\n' >> "${file}"
 #--- Apply new aliases
 source "${file}" || source ~/.zshrc
-
 
 ##### Install (GNOME) Terminator
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing (GNOME) ${GREEN}Terminator${RESET} ~ multiple terminals in a single window"
@@ -381,7 +366,6 @@ cat <<EOF > "${file}" \
       parent = ""
 [plugins]
 EOF
-
 ##### Install ZSH & Oh-My-ZSH - root user.   Note:  'Open terminal here', will not work with ZSH.   Make sure to have tmux already installed
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ZSH${RESET} & ${GREEN}Oh-My-ZSH${RESET} ~ unix shell"
 apt -y -qq install zsh git curl \
@@ -411,7 +395,6 @@ sed -i 's/  git/  git\n  git-extras\n  tmux\n  dirhistory\n  python\n  pip\n  su
 #--- Set zsh as default shell (current user)
 chsh -s "$(which zsh)"
 
-
 ##### Install tmux - all users
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}tmux${RESET} ~ multiplex virtual consoles"
 apt -y -qq install tmux \
@@ -425,34 +408,27 @@ cat <<EOF > "${file}" \
 unbind C-b
 set -g prefix C-a
 bind-key C-a send-prefix
-
 ## Split panes using | and -
 bind | split-window -h
 bind - split-window -v
 unbind '"'
 unbind %
-
 ## Switch panes using Alt-arrow without prefix
 bind -n M-Left select-pane -L
 bind -n M-Right select-pane -R
 bind -n M-Up select-pane -U
 bind -n M-Down select-pane -D
-
 ## Activity Monitoring
 setw -g monitor-activity on
 set -g visual-activity on
-
 ## Enable mouse mode
 set -g mouse on
-
 ## Set defaults
 set -g default-terminal screen-256color
 set -g history-limit 5000
-
 ## Reload settings (CTRL+a -> r)
 unbind r
 bind r source-file ~/.tmux.conf
-
 ## Load custom sources
 #source ~/.bashrc   #(issues if you use /bin/bash & Debian)
 
@@ -462,34 +438,28 @@ EOF
 cat <<EOF >> "${file}"
 ## Show tmux messages for longer
 set -g display-time 3000
-
 ## Status bar is redrawn every minute
 set -g status-interval 60
-
 
 ######################
 ### DESIGN CHANGES ###
 ######################
-
 # loud or quiet?
 set-option -g visual-activity off
 set-option -g visual-bell off
 set-option -g visual-silence off
 set-window-option -g monitor-activity off
 set-option -g bell-action none
-
 #  modes
 setw -g clock-mode-colour colour5
 setw -g mode-attr bold
 setw -g mode-fg colour1
 setw -g mode-bg colour18
-
 # panes
 set -g pane-border-bg colour0
 set -g pane-border-fg colour4
 set -g pane-active-border-bg colour0
 set -g pane-active-border-fg colour9
-
 # statusbar
 set -g status-position bottom
 set -g status-justify left
@@ -502,19 +472,16 @@ set -g status-left ''
 set -g status-right '#[fg=colour233,bg=colour247,bold] %d/%m #[fg=colour233,bg=colour250,bold] %H:%M:%S '
 set -g status-right-length 50
 set -g status-left-length 20
-
 # Current windows color on the statusbar
 setw -g window-status-current-fg colour51 #Window number
 setw -g window-status-current-bg colour250
 setw -g window-status-current-attr bold
 setw -g window-status-current-format ' #I#[fg=colour250]:#[fg=colour51]#W#[fg=colour250]#F '
-
 # Windows unused color on the statusbar
 setw -g window-status-fg colour9
 setw -g window-status-bg colour246
 setw -g window-status-attr none
 setw -g window-status-format ' #I#[fg=colour246]:#[fg=colour9]#W#[fg=colour246]#F '
-
 # messages
 set -g message-attr bold
 set -g message-fg colour15
@@ -527,7 +494,6 @@ grep -q '^alias tmux' "${file}" 2>/dev/null \
   || echo -e '## tmux\nalias tmux="tmux attach || tmux new"\n' >> "${file}"    #alias tmux="tmux attach -t $HOST || tmux new -s $HOST"
 #--- Apply new alias
 source "${file}" || source ~/.zshrc
-
 
 ##### Install vim - all users
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}vim${RESET} ~ CLI text editor"
@@ -590,7 +556,6 @@ git config --global mergetool.prompt false
 #--- Set as default push
 git config --global push.default simple
 
-
 ##### Install cyberchef
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CyberChef${RESET} ~ Conversion WebApp"
 timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v8.29.1/cyberchef.htm" > /var/www/html/cyberchef.htm \
@@ -600,11 +565,12 @@ timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Boostnote${RESET} ~ Note-taking App"
 timeout 300 curl --progress -k -L -f "https://github.com/BoostIO/boost-releases/releases/download/v0.11.15/boostnote_0.11.15_amd64.deb" > /tmp/boostnote.deb \
   || echo -e ' '${RED}'[!] Issue with Boostnote download'${RESET} 1>&2
+apt install gconf-service libgconf-2-4 gconf2-common gconf2 gvfs-bin \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 if [ -e /tmp/boostnote.deb ]; then
   dpkg -i /tmp/boostnote.deb \
   || echo -e ' '${RED}'[!] Issue with Boostnote install'${RESET} 1>&2
 fi
-
 
 ##### Install metasploit ~ http://docs.kali.org/general-use/starting-metasploit-framework-in-kali
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}metasploit${RESET} ~ exploit framework"
@@ -629,10 +595,8 @@ systemctl start postgresql
 msfdb start
 msfconsole -q -x 'version;db_status;sleep 310;exit'
 
-
 ##### Install Sublime
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Sublime${RESET} ~ GUI text editor"
-#--- Install Sublime
 wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add - \
   || echo -e ' '${RED}'[!] Issue at sublime gpg key install'${RESET} 1>&2
 apt -y -qq install apt-transport-https \
@@ -643,12 +607,10 @@ apt -y -qq install sublime-text \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 
-
 ##### Install wdiff
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}wdiff${RESET} ~ Compares two files word by word"
 apt -y -qq install wdiff wdiff-doc \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 
 ##### Install vbindiff
@@ -656,19 +618,16 @@ apt -y -qq install wdiff wdiff-doc \
 apt -y -qq install vbindiff \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-
 ##### Install virtualenvwrapper
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}virtualenvwrapper${RESET} ~ virtual environment wrapper"
 apt -y -qq install virtualenvwrapper \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install wireshark
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Wireshark${RESET} ~ GUI network protocol analyzer"
 #--- Disable lua warning
 [ -e "/usr/share/wireshark/init.lua" ] \
   && mv -f /usr/share/wireshark/init.lua{,.disabled}
-
 
 ##### Install rips
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}rips${RESET} ~ source code scanner"
@@ -696,7 +655,6 @@ EOF
 ln -sf /etc/apache2/conf-available/rips.conf /etc/apache2/conf-enabled/rips.conf
 systemctl restart apache2
 
-
 ##### Install graudit
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}graudit${RESET} ~ source code auditing"
 apt -y -qq install git \
@@ -717,12 +675,10 @@ cd /opt/graudit-git/ && bash graudit.sh "\$@"
 EOF
 chmod +x "${file}"
 
-
 ##### Install libreoffice
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}LibreOffice${RESET} ~ GUI office suite"
 apt -y -qq install libreoffice \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install asciinema
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}asciinema${RESET} ~ CLI terminal recorder"
@@ -730,18 +686,15 @@ apt -y -qq install libreoffice \
 apt -y -qq install asciinema \
    || echo -e ' '${RED}'[!] Issue with apt install asciinema'${RESET} 1>&2
 
-
 ##### Install htop
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}htop${RESET} ~ CLI process viewer"
 apt -y -qq install htop \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-
 ##### Install ca-certificates
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ca-certificates${RESET} ~ HTTPS/SSL/TLS"
 apt -y -qq install ca-certificates \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install testssl
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}testssl${RESET} ~ Testing TLS/SSL encryption"
@@ -751,24 +704,25 @@ pushd /opt/testssl-git/ >/dev/null
 git pull -q
 popd >/dev/null
 
-
 ##### Install gparted
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}GParted${RESET} ~ GUI partition manager"
 apt -y -qq install gparted \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-
 ##### Install filezilla
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}FileZilla${RESET} ~ GUI file transfer"
-apt -y -qq install filezilla \
+apt -y -qq install filezilla ftp \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
+##### Install VLC
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}VLC${RESET} ~ Video player"
+apt -y -qq install vlc \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 ##### Install zip & unzip
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}zip${RESET} & ${GREEN}unzip${RESET} ~ CLI file extractors"
 apt -y -qq install zip unzip \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install VPN support
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}VPN${RESET} support for Network-Manager"
@@ -776,30 +730,25 @@ for FILE in network-manager-openvpn network-manager-pptp network-manager-vpnc op
   apt -y -qq install "${FILE}" \
     || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 done
-
 ##### Install hashid
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}hashid${RESET} ~ identify hash types"
 apt -y -qq install hashid \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install wafw00f
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}wafw00f${RESET} ~ WAF detector"
 apt -y -qq install wafw00f \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-
 ##### Install aircrack-ng
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Aircrack-ng${RESET} ~ Wi-Fi cracking suite"
 apt -y -qq install aircrack-ng curl \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-
 ##### Install wifite
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}wifite${RESET} ~ automated Wi-Fi tool"
 apt -y -qq install wifite \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install reGeorg
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}reGeorg${RESET} ~ pivot via web shells"
@@ -812,7 +761,6 @@ popd >/dev/null
 apt -y -qq install webshells \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 ln -sf /opt/reGeorg-git /usr/share/webshells/reGeorg
-
 ##### Install PownyShell
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}P0wny Shell${RESET} ~ web shell"
 apt -y -qq install git \
@@ -827,13 +775,6 @@ apt -y -qq install webshells \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 ln -sf /opt/pownyshell-git /usr/share/webshells/php/p0wnyshell
 
-
-##### Install htshells
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}htShells${RESET} ~ (htdocs/apache) web shells"
-apt -y -qq install htshells \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
-
 ##### Install FruityWifi
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}FruityWifi${RESET} ~ Wireless network auditing tool"
 apt -y -qq install fruitywifi \
@@ -843,7 +784,6 @@ if [[ -e /var/www/html/index.nginx-debian.html ]]; then
   grep -q '<title>Welcome to nginx on Debian!</title>' /var/www/html/index.nginx-debian.html \
     && echo 'Permission denied.' > /var/www/html/index.nginx-debian.html
 fi
-
 
 ##### Install proxychains-ng (https://bugs.kali.org/view.php?id=2037)
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}proxychains-ng${RESET} ~ Proxifier"
@@ -861,31 +801,21 @@ popd >/dev/null
 mkdir -p /usr/local/bin/
 ln -sf /usr/bin/proxychains4 /usr/local/bin/proxychains-ng
 
-
 ##### Install gcc & multilib
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}gcc${RESET} & ${GREEN}multilibc${RESET} ~ compiling libraries"
 for FILE in cc gcc g++ gcc-multilib make automake libc6 libc6-dev libc6-amd64 libc6-dev-amd64 libc6-i386 libc6-dev-i386 libc6-i686 libc6-dev-i686 build-essential dpkg-dev; do
   apt -y -qq install "${FILE}" 2>/dev/null
 done
 
-
-##### Downloading PsExec.exe
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Downloading ${GREEN}PsExec.exe${RESET} ~ Pass The Hash 'phun'"
-apt -y -qq install curl windows-binaries unzip unrar \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-echo -n '[1/2]'; timeout 300 curl --progress -k -L -f "https://download.sysinternals.com/files/PSTools.zip" > /tmp/pstools.zip \
-  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading pstools.zip" 1>&2
-# echo -n '[2/2]'; timeout 300 curl --progress -k -L -f "http://www.coresecurity.com/system/files/pshtoolkit_v1.4.rar" > /tmp/pshtoolkit.rar \
-#   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading pshtoolkit.rar" 1>&2  #***!!! hardcoded path!
-unzip -q -o -d /usr/share/windows-binaries/pstools/ /tmp/pstools.zip
-# unrar x -y /tmp/pshtoolkit.rar /usr/share/windows-binaries/ >/dev/null
-
-
-##### Install responder
+##### Install Responder
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Responder${RESET} ~ rogue server"
 apt -y -qq install responder \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
+##### Install Bloodhound
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Bloodhound${RESET} ~ Six Degrees of Domain Admin"
+apt -y -qq install bloodhound \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 ##### Install seclist
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}seclist${RESET} ~ multiple types of (word)lists (and similar things)"
@@ -897,7 +827,6 @@ apt -y -qq install wordlists \
 [ -e /usr/share/seclists ] \
   && ln -sf /usr/share/seclists /usr/share/wordlists/seclists
 #  https://github.com/fuzzdb-project/fuzzdb
-
 
 ##### Update wordlists
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Updating ${GREEN}wordlists${RESET} ~ collection of wordlists"
@@ -916,22 +845,11 @@ curl --progress -k -L -f "https://raw.githubusercontent.com/Chill3d/SecLists/mas
 #--- Extract sqlmap wordlist
 unzip -o -d /usr/share/sqlmap/txt/ /usr/share/sqlmap/txt/wordlist.zip
 ln -sf /usr/share/sqlmap/txt/wordlist.txt /usr/share/wordlists/sqlmap.txt
-#--- Not enough? Want more? Check below!
-#apt search wordlist
-#find / \( -iname '*wordlist*' -or -iname '*passwords*' \) #-exec ls -l {} \;
-
-
-##### Install apt-show-versions
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}apt-show-versions${RESET} ~ which package version in repo"
-apt -y -qq install apt-show-versions \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install smbmap
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}smbmap${RESET} ~ SMB enumeration tool"
 apt -y -qq install smbmap \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-
 
 ##### Install smbspider
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}smbspider${RESET} ~ search network shares"
@@ -943,7 +861,6 @@ pushd /opt/smbspider-git/ >/dev/null
 git pull -q
 popd >/dev/null
 
-
 ##### Install CrackMapExec
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CrackMapExec${RESET} ~ Swiss army knife for Windows environments"
 apt -y -qq install git \
@@ -953,7 +870,6 @@ git clone -q -b master https://github.com/byt3bl33d3r/CrackMapExec.git /opt/crac
 pushd /opt/crackmapexec-git/ >/dev/null
 git pull -q
 popd >/dev/null
-
 
 ##### Install Dirsearch
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Dirsearch${RESET} ~ Web Path Scanner"
@@ -971,7 +887,6 @@ grep -q '^## dirsearch' "${file}" 2>/dev/null \
   || echo -e '## dirsearch\nalias dirsearch="/opt/dirsearch-git/dirsearch.py"\n' >> "${file}"
 #--- Apply new alias
 source "${file}" || source ~/.zshrc
-
 
 ##### Install CMSmap
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CMSmap${RESET} ~ CMS detection"
@@ -993,7 +908,6 @@ cd /opt/cmsmap-git/ && python cmsmap.py "\$@"
 EOF
 chmod +x "${file}"
 
-
 ##### Install droopescan
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}DroopeScan${RESET} ~ Drupal vulnerability scanner"
 apt -y -qq install git \
@@ -1014,7 +928,6 @@ cd /opt/droopescan-git/ && python droopescan "\$@"
 EOF
 chmod +x "${file}"
 
-
 ##### Install patator (GIT)
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}patator${RESET} (GIT) ~ brute force"
 apt -y -qq install git \
@@ -1034,7 +947,6 @@ cat <<EOF > "${file}" \
 cd /opt/patator-git/ && python patator.py "\$@"
 EOF
 chmod +x "${file}"
-
 
 ##### Install nbtscan ~ http://unixwiz.net/tools/nbtscan.html vs http://inetcat.org/software/nbtscan.html (see http://sectools.org/tool/nbtscan/)
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}nbtscan${RESET} (${GREEN}inetcat${RESET} & ${GREEN}unixwiz${RESET}) ~ netbios scanner"
@@ -1059,7 +971,6 @@ ln -sf /usr/local/src/nbtscan-unixwiz/nbtscan /usr/local/bin/nbtscan-uw
 #--- Examples
 #nbtscan-uw -f 192.168.0.1/24
 
-
 ##### Install apache2 & php
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}apache2${RESET} & ${GREEN}php${RESET} ~ web server"
 apt -y -qq install apache2 php php-cli php-curl \
@@ -1077,21 +988,6 @@ grep -q '^## www' "${file}" 2>/dev/null \
 #--- Apply new alias
 source "${file}" || source ~/.zshrc
 
-
-##### Install mysql
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}MySQL${RESET} ~ database"
-apt -y -qq install default-mysql-server \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-echo -e " ${YELLOW}[i]${RESET} MySQL username: root"
-echo -e " ${YELLOW}[i]${RESET} MySQL password: <blank>   ***${BOLD}CHANGE THIS ASAP${RESET}***"
-[[ -e ~/.my.cnf ]] \
-  || cat <<EOF > ~/.my.cnf
-[client]
-user=root
-host=localhost
-password=
-EOF
-
 ##### Install GitTools
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}GitTools${RESET} ~ .git extractor"
 git clone -q -b master https://github.com/internetwache/GitTools /opt/gittools-git/ \
@@ -1108,7 +1004,6 @@ pushd /opt/spiderfoot-git/ >/dev/null
 git pull -q
 popd >/dev/null
 
-
 ##### Install DBeaver
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}DBeaver${RESET} ~ GUI DB manager"
 apt -y -qq install curl \
@@ -1123,6 +1018,15 @@ if [ -e /tmp/dbeaver.deb ]; then
   mkdir -p /usr/local/bin/
   ln -sf /usr/share/dbeaver/dbeaver /usr/local/bin/dbeaver
 fi
+
+##### Install Docker
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Docker${RESET} ~ Container platform"
+wget -qO - https://download.docker.com/linux/debian/gpg | sudo apt-key add - \
+  || echo -e ' '${RED}'[!] Issue at sublime gpg key install'${RESET} 1>&2
+echo "deb https://download.docker.com/linux/debian stretch stable" | sudo tee /etc/apt/sources.list.d/docker.list
+apt -qq update
+apt -y -qq install docker-ce \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 
 ##### Clean the system
@@ -1140,18 +1044,16 @@ for i in $(cut -d: -f6 /etc/passwd | sort -u); do
   [ -e "${i}" ] && find "${i}" -type f -name '.*_history' -delete
 done
 
-
 ##### Time taken
 finish_time=$(date +%s)
 echo -e "\n\n ${YELLOW}[i]${RESET} Time (roughly) taken: ${YELLOW}$(( $(( finish_time - start_time )) / 60 )) minutes${RESET}"
 echo -e " ${YELLOW}[i]${RESET} Stages skipped: $(( TOTAL-STAGE ))"
 
-
 ##### Done!
 echo -e "\n ${YELLOW}[i]${RESET} Don't forget to:"
 echo -e " ${YELLOW}[i]${RESET} + Check the above output (Did everything install? Any errors? (${RED}HINT: What's in RED${RESET}?)"
 echo -e " ${YELLOW}[i]${RESET} + Setup git:   ${YELLOW}git config --global user.name <name>;git config --global user.email <email>${RESET}"
-echo -e " ${YELLOW}[i]${RESET} + ${BOLD}Change default passwords${RESET}: PostgreSQL/MSF, MySQL, etc"
+echo -e " ${YELLOW}[i]${RESET} + ${BOLD}Change default passwords${RESET}: PostgreSQL/MSF, MySQL, Neo4j etc."
 echo -e " ${YELLOW}[i]${RESET} + ${YELLOW}Reboot${RESET}"
 (dmidecode | grep -iq virtual) \
   && echo -e " ${YELLOW}[i]${RESET} + Take a snapshot   (Virtual machine detected)"

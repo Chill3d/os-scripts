@@ -31,8 +31,8 @@ fi
 #-Defaults-------------------------------------------------------------#
 
 ##### Location information
-keyboardLayout="fr"           # Set keyboard layout                                       
-timezone="Europe/Paris"       # Set timezone location                                     
+keyboardLayout="fr"           # Set keyboard layout
+timezone="Europe/Paris"       # Set timezone location
 ##### (Optional) Enable debug mode?
 #set -x
 ##### (Cosmetic) Colour output
@@ -89,14 +89,6 @@ if [[ $(which gnome-shell) ]]; then
 #   echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping disabling package updater${RESET}..."
 fi
 
-##### Disable Touchscreen if there is one
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Disabling ${GREEN}Touchscreen${RESET} if there is one"
-apt -y -qq install xinput \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-for id in `xinput --list|grep 'Touchscreen'|perl -ne 'while (m/id=(\d+)/g){print "$1\n";}'`; do
-  xinput disable $id
-done
-
 ##### Check Internet access
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Checking ${GREEN}Internet access${RESET}"
 #--- Can we ping google?
@@ -136,6 +128,7 @@ if [[ "$?" -ne 0 ]]; then
   echo -e " ${YELLOW}[i]${RESET} Are the remote network repositories ${YELLOW}currently being sync'd${RESET}?"
   exit 1
 fi
+
 ##### Update location information - set either value to "" to skip.
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Updating ${GREEN}location information${RESET}"
 #--- Configure keyboard layout (location)
@@ -155,6 +148,7 @@ if [[ -n "${timezone}" ]]; then
 else
   echo -e "\n\n ${YELLOW}[i]${RESET} ${YELLOW}Skipping time zone${RESET} (missing: '$0 ${BOLD}--timezone <value>${RESET}')..." 1>&2
 fi
+
 #--- Installing ntp tools
 (( STAGE++ )); echo -e " ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ntpdate${RESET} ~ keeping the time in sync"
 apt -y -qq install ntp ntpdate \
@@ -190,6 +184,14 @@ if [[ "${_TMP}" -gt 1 ]]; then
     echo -e " ${YELLOW}[i]${RESET} ${YELLOW}You're using the latest kernel${RESET} (Good to continue)"
   fi
 fi
+
+##### Disable Touchscreen if there is one
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Disabling ${GREEN}Touchscreen${RESET} if there is one"
+apt -y -qq install xinput \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+for id in `xinput --list|grep 'Touchscreen'|perl -ne 'while (m/id=(\d+)/g){print "$1\n";}'`; do
+  xinput disable $id
+done
 
 ##### Install kernel headers
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}kernel headers${RESET}"

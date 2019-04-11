@@ -382,7 +382,7 @@ apt -y -qq install apt-transport-https \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
 apt -qq update
-apt -y -qq install sublime-text \
+apt -y -qq install sublime-text sublime-merge \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 

@@ -269,7 +269,7 @@ apt -y -qq install terminator \
 
 ##### Install ZSH & Oh-My-ZSH - root user.   Note:  'Open terminal here', will not work with ZSH.   Make sure to have tmux already installed
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ZSH${RESET} & ${GREEN}Oh-My-ZSH${RESET} ~ unix shell"
-apt -y -qq install zsh git curl \
+apt -y -qq install zsh git curl jq \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 ##### Install tmux - all users
@@ -340,8 +340,11 @@ git config --global push.default simple
 
 ##### Install cyberchef
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CyberChef${RESET} ~ Conversion WebApp"
-timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v8.29.1/cyberchef.htm" > /var/www/html/cyberchef.htm \
+timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v8.31.5/CyberChef_v8.31.5.zip" > /var/www/html/cyberchef_v8.31.5.zip \
   || echo -e ' '${RED}'[!] Issue with CyberChef download'${RESET} 1>&2
+unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v8.31.5.zip \
+  || echo -e ' '${RED}'[!] Issue with unzip Cyberchef'${RESET} 1>&2
+ln -sf /var/www/html/cyberchef/CyberChef_*.html /var/www/html/cyberchef/cyberchef.htm
 
 ##### Install Boostnote
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Boostnote${RESET} ~ Note-taking App"
@@ -387,6 +390,10 @@ apt -qq update
 apt -y -qq install sublime-text sublime-merge \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
+##### Install Nextcloud client
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Nextcloud Client${RESET} ~ File sync"
+apt -y -qq install nextcloud-desktop nautilus-nextcloud \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
 ##### Install wdiff
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}wdiff${RESET} ~ Compares two files word by word"

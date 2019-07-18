@@ -346,15 +346,13 @@ unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v8.31.5.zip \
   || echo -e ' '${RED}'[!] Issue with unzip Cyberchef'${RESET} 1>&2
 ln -sf /var/www/html/cyberchef/CyberChef_*.html /var/www/html/cyberchef/cyberchef.htm
 
-##### Install Boostnote
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Boostnote${RESET} ~ Note-taking App"
-timeout 300 curl --progress -k -L -f "https://github.com/BoostIO/boost-releases/releases/download/v0.11.15/boostnote_0.11.15_amd64.deb" > /tmp/boostnote.deb \
-  || echo -e ' '${RED}'[!] Issue with Boostnote download'${RESET} 1>&2
-apt install gconf-service libgconf-2-4 gconf2-common gconf2 gvfs-bin \
-  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-if [ -e /tmp/boostnote.deb ]; then
-  dpkg -i /tmp/boostnote.deb \
-  || echo -e ' '${RED}'[!] Issue with Boostnote install'${RESET} 1>&2
+##### Install Notable
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Notable${RESET} ~ Note-taking App"
+timeout 300 curl --progress -k -L -f "https://github.com/notable/notable/releases/download/v1.6.2/Notable.Setup.1.6.2.exe" > /tmp/notable.deb \
+  || echo -e ' '${RED}'[!] Issue with Notable download'${RESET} 1>&2
+if [ -e /tmp/notable.deb ]; then
+  dpkg -i /tmp/notable.deb \
+  || echo -e ' '${RED}'[!] Issue with Notable install'${RESET} 1>&2
 fi
 
 ##### Install metasploit ~ http://docs.kali.org/general-use/starting-metasploit-framework-in-kali
@@ -517,6 +515,16 @@ apt -y -qq install vlc \
 apt -y -qq install zip unzip \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
+##### Install aha
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}aha${RESET} ~ CLI HTML converter"
+apt -y -qq install aha \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+
+##### Install gnome-screenshot
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}gnome-screenshot${RESET} ~ screenshot utility"
+apt -y -qq install gnome-screenshot \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+
 ##### Install VPN support
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}VPN${RESET} support for Network-Manager"
 for FILE in network-manager-openvpn network-manager-pptp network-manager-vpnc openconnect; do
@@ -663,6 +671,17 @@ git clone -q -b master https://github.com/byt3bl33d3r/CrackMapExec.git /opt/crac
 pushd /opt/crackmapexec-git/ >/dev/null
 git pull -q
 popd >/dev/null
+
+##### Install PayloadsAllTheThings
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}PayloadsAllTheThings${RESET} ~ List of useful payloads and bypass for Web"
+apt -y -qq install git \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+git clone -q -b master https://github.com/swisskyrepo/PayloadsAllTheThings /opt/payloadsallthethings-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/crackmapexec-git/ >/dev/null
+git pull -q
+popd >/dev/null
+ln -sf /opt/payloadsallthethings-git/ /usr/share/wordlists/payloadsallthethings
 
 ##### Install Dirsearch
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Dirsearch${RESET} ~ Web Path Scanner"

@@ -82,7 +82,7 @@ if [[ $(which gnome-shell) ]]; then
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-position 'RIGHT'   # Set dock to the right
   gsettings set org.gnome.shell.extensions.dash-to-dock dock-fixed true         # Set dock to be always visible
   gsettings set org.gnome.shell favorite-apps \
-    "['org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'kali-burpsuite.desktop', 'kali-wireshark.desktop', 'sublime_text.desktop']"
+    "['org.gnome.Terminal.desktop', 'org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'kali-burpsuite.desktop', 'kali-wireshark.desktop', 'sublime_text.desktop', org.gnome.Screenshot.desktop]"
   #-- Gnome Extension - Window list
   GNOME_EXTENSIONS=$(gsettings get org.gnome.shell enabled-extensions | sed 's_^.\(.*\).$_\1_')
   echo "${GNOME_EXTENSIONS}" | grep -q "window-list@gnome-shell-extensions.gcampax.github.com" \

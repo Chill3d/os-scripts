@@ -1,30 +1,73 @@
 # OS-Scripts
 
-Personal collection of Operating System (OS) scripts _(and related things)_.
-
+Personnal script installing tools on a fresh Kali Linux. Issued from https://github.com/g0tmi1k/os-scripts
 - - -
+## Packets installed
+* ntp ntpdate
+* xinput
+* kali-linux-full
+* grc
+* bash-completion
+* terminator
+* zsh 
+* git
+* curl
+* jq
+* tmux
+* vim
+* metasploit-framework
+* apt-transport-https
+* sublime-text sublime-merge
+* nextcloud-desktop nautilus-nextcloud
+* wdiff
+* wdiff-doc
+* vbindiff
+* virtualenvwrapper
+* apache2
+* php 
+* libreoffice
+* asciinema
+* htop
+* ca-certificates
+* keepass2
+* gparted
+* filezilla ftp
+* vlc
+* zip unzip
+* aha
+* gnome-screenshot
+* hashid
+* wafw00f
+* aircrack-ng
+* wifite
+* webshells
+* fruitywifi
+* gcc
+* responder
+* bloodhound
+* seclists
+* wordlists
+* smbmap
 
-## Kali Rolling
+## Applications downloaded
+* Cyberchef
+* Notable
+* nbtscan
+* dbeaver
 
-Kali Rolling (2016.1) _(Debian Testing)_
-![](https://i.imgur.com/23dGQEa.png)
-_Left: tweaked GNOME 3.18,  Right: custom XFCE 4.12.  Both running conky._
-
-- - -
-
-## Kali v2.x
-
-Kali 2.x _(Debian 8)_
-![](https://i.imgur.com/oJxBQNy.png)
-_Left: tweaked GNOME 3.10,  Right: custom XFCE 4.10.  Both running conky._
-
-- - -
-
-## Kali v1.x
-
-Kali 1.x _(Debian 7)_
-![](https://i.imgur.com/8D69XMO.png)
-_Left: stock GNOME 3.4,  Right: custom XFCE 4.8.  Both with conky._
-
-_...Misc screenshots of **JUST** XFCE (no conky/ZSH/Tweaks)_
-![](https://i.imgur.com/P2Oj28f.png)
+## Repositories cloned
+* [RIPS](https://github.com/ripsscanner/rips.git)
+* [Graudit](https://github.com/wireghoul/graudit.git)
+* [Testssl](https://github.com/drwetter/testssl.sh.git)
+* [reGeorg](https://github.com/sensepost/reGeorg.git)
+* [p0wny-shell](https://github.com/flozz/p0wny-shell.git)
+* [proxychains-ng](https://github.com/rofl0r/proxychains-ng.git)
+* [smbspider](https://github.com/T-S-A/smbspider.git)
+* [CrackMapExec](https://github.com/byt3bl33d3r/CrackMapExec.git)
+* [PayloadsAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings)
+* [Dirsearch](https://github.com/maurosoria/dirsearch.git)
+* [CMSmap](https://github.com/Dionach/CMSmap.git)
+* [droopscan](https://github.com/droope/droopescan.git)
+* [patator](https://github.com/lanjelot/patator.git)
+* [GitTools](https://github.com/internetwache/GitTools)
+* [SpiderFoot](https://github.com/smicallef/spiderfoot)

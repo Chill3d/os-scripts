@@ -204,6 +204,8 @@ git clone -q -b master https://github.com/zsh-users/zsh-autosuggestions.git ${ZS
 sed -i 's/ZSH_THEME=.*/ZSH_THEME="robbyrussell"/' "${file}"   # Other themes: mh, jreese, alanpeabody, candy, terminalparty, kardan, nicoulaj, sunaku
 #--- Configure oh-my-zsh plugins
 sed -i 's/git)/\n  git\n  git-extras\n  tmux\n  dirhistory\n  python\n  pip\n  sublime\n  encode64\n  zsh-autosuggestions\n)/' "${file}"
+#--- Add timestamp in command line
+echo -e "PROMPT='%D{%f/%m}|%D{%L:%M:%S} \${ret_status}%{\$fg_bold[green]%}%p %{\$fg[cyan]%}%c %{\$fg_bold[blue]%}\$(git_prompt_info)%{\$fg_bold[blue]%}%{\$reset_color%}'" >> "${file}"
 #--- Set zsh as default shell (current user)
 chsh -s "$(which zsh)"
 

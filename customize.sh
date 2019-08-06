@@ -264,40 +264,35 @@ set-window-option -g monitor-activity off
 set-option -g bell-action none
 #  modes
 setw -g clock-mode-colour colour5
-setw -g mode-attr bold
-setw -g mode-fg colour1
-setw -g mode-bg colour18
+setw -g mode-style fg=colour1,bg=colour18,bold
+
 # panes
-set -g pane-border-bg colour0
-set -g pane-border-fg colour4
-set -g pane-active-border-bg colour0
-set -g pane-active-border-fg colour9
+set -g pane-border-style bg=colour0,fg=colour4
+set -g pane-active-border fg=colour0,bg=colour9
+
 # statusbar
 set -g status-position bottom
 set -g status-justify left
+
 #Background bar
-set -g status-bg colour244
-set -g status-fg colour219
-set -g status-attr dim
 set -g status-left ''
+set -g status-style bg=colour244,fg=colour219,dim
+
 #Date at right
 set -g status-right '#[fg=colour233,bg=colour247,bold] %d/%m #[fg=colour233,bg=colour250,bold] %H:%M:%S '
 set -g status-right-length 50
 set -g status-left-length 20
+
 # Current windows color on the statusbar
-setw -g window-status-current-fg colour51 #Window number
-setw -g window-status-current-bg colour250
-setw -g window-status-current-attr bold
 setw -g window-status-current-format ' #I#[fg=colour250]:#[fg=colour51]#W#[fg=colour250]#F '
+setw -g window-status-current-style fg=colour51,bg=colour250,bold
+
 # Windows unused color on the statusbar
-setw -g window-status-fg colour9
-setw -g window-status-bg colour246
-setw -g window-status-attr none
 setw -g window-status-format ' #I#[fg=colour246]:#[fg=colour9]#W#[fg=colour246]#F '
+setw -g window-status-style fg=colour9,bg=colour246,none
+
 # messages
-set -g message-attr bold
-set -g message-fg colour15
-set -g message-bg colour16
+set -g message-style fg=colour15,bg=colour16,bold
 EOF
 #--- Setup startup
 file=~/.zshrc; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/tmux.conf

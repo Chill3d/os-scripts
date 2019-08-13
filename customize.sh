@@ -89,6 +89,9 @@ if [[ $(which gnome-shell) ]]; then
     || gsettings set org.gnome.shell enabled-extensions "[${GNOME_EXTENSIONS}, 'window-list@gnome-shell-extensions.gcampax.github.com']"
   #--- Top bar
   gsettings set org.gnome.desktop.interface clock-show-date true                           # Show date next to time in the top tool bar
+  #--- Orientation lock 
+  gsettings set org.gnome.settings-daemon.peripherals.touchscreen orientation-lock true \
+    || echo -e ' '${RED}'[!] Issue when trying to lock screen autorotation'${RESET} 1>&2
   #--- Hide desktop icon
   dconf write /org/gnome/nautilus/desktop/computer-icon-visible false
 else

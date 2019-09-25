@@ -340,9 +340,9 @@ git config --global push.default simple
 
 ##### Install cyberchef
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CyberChef${RESET} ~ Conversion WebApp"
-timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v9.0.4/CyberChef_v9.0.4.zip" > /var/www/html/cyberchef_v9.0.4.zip \
+timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v9.7.1/CyberChef_v9.7.1.zip" > /var/www/html/cyberchef_v9.7.1.zip \
   || echo -e ' '${RED}'[!] Issue with CyberChef download'${RESET} 1>&2
-unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v9.0.4.zip \
+unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v9.7.1.zip \
   || echo -e ' '${RED}'[!] Issue with unzip Cyberchef'${RESET} 1>&2
 ln -sf /var/www/html/cyberchef/CyberChef_*.html /var/www/html/cyberchef/cyberchef.htm
 

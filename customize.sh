@@ -208,7 +208,11 @@ sed -i 's/ZSH_THEME=.*/ZSH_THEME="robbyrussell"/' "${file}"   # Other themes: mh
 #--- Configure oh-my-zsh plugins
 sed -i 's/git)/\n  git\n  git-extras\n  tmux\n  dirhistory\n  python\n  pip\n  sublime\n  encode64\n  zsh-autosuggestions\n)/' "${file}"
 #--- Add timestamp in command line
-echo -e "PROMPT='%D{%f/%m}|%D{%L:%M:%S} \${ret_status}%{\$fg_bold[green]%}%p %{\$fg[cyan]%}%c %{\$fg_bold[blue]%}\$(git_prompt_info)%{\$fg_bold[blue]%}%{\$reset_color%}'" >> "${file}"
+echo -e "IP=\`ifconfig eth0 2>/dev/null | sed -n 2,2p | cut -d\" \" -f 10\`" >> "${file}"
+echo -e "PROMPT='%D{%f/%m}|%D{%L:%M:%S}%{\$fg[grey]%} \$IP \${ret_status}%{\$fg_bold[green]%}%p %{\$fg[cyan]%}%c %{\$fg_bold[blue]%}\$(git_prompt_info)%{\$fg_bold[blue]%}%{\$reset_color%}'" >> "${file}"
+#--- Log every command typed in shell
+echo -e "test \"\$(ps -ocommand= -p \$PPID | awk '{print \$1}')\" = \"script\" || (script -f \$HOME/.CMD_LOG/\$(date +\"%d-%b-%y_%H-%M-%S\")_shell.log)" >> "${file}"
+mkdir $HOME/.CMD_LOG
 #--- Set zsh as default shell (current user)
 chsh -s "$(which zsh)"
 

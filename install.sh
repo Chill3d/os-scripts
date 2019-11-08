@@ -340,15 +340,15 @@ git config --global push.default simple
 
 ##### Install cyberchef
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CyberChef${RESET} ~ Conversion WebApp"
-timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v9.7.1/CyberChef_v9.7.1.zip" > /var/www/html/cyberchef_v9.7.1.zip \
+timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v9.11.0/CyberChef_v9.11.0.zip" > /var/www/html/cyberchef_v9.11.0.zip \
   || echo -e ' '${RED}'[!] Issue with CyberChef download'${RESET} 1>&2
-unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v9.7.1.zip \
+unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v9.11.0.zip \
   || echo -e ' '${RED}'[!] Issue with unzip Cyberchef'${RESET} 1>&2
 ln -sf /var/www/html/cyberchef/CyberChef_*.html /var/www/html/cyberchef/cyberchef.htm
 
 ##### Install Notable
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Notable${RESET} ~ Note-taking App"
-timeout 300 curl --progress -k -L -f "https://github.com/notable/notable/releases/download/v1.7.3/notable_1.7.3_amd64.deb" > /tmp/notable.deb \
+timeout 300 curl --progress -k -L -f "https://github.com/notable/notable/releases/download/v1.8.0/notable_1.8.0_amd64.deb" > /tmp/notable.deb \
   || echo -e ' '${RED}'[!] Issue with Notable download'${RESET} 1>&2
 if [ -e /tmp/notable.deb ]; then
   dpkg -i /tmp/notable.deb \

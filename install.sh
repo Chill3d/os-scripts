@@ -398,7 +398,6 @@ apt -y -qq install nextcloud-desktop nautilus-nextcloud \
 apt -y -qq install wdiff wdiff-doc \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
-
 ##### Install vbindiff
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}vbindiff${RESET} ~ visually compare binary files"
 apt -y -qq install vbindiff \
@@ -826,6 +825,17 @@ apt -qq update
 apt -y -qq install docker-ce \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 
+##### Install Auditd
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Auditd${RESET} ~ Linux Audit daemon"
+apt -y -qq install auditd \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+file=/etc/audit/rules.d/audit.rules; [ -e "${file}" ] && cp -n $file{,.bkup}
+echo -e "# Ajout manuel" >> "${file}"
+echo -e "-a exit,always -F arch=b64 -S execve" >> "${file}"
+echo -e "-a exit,always -F arch=b32 -S execve" >> "${file}"
+#--- Lancement au démarrage d'auditd
+update-rc.d auditd defaults 
+/etc/init.d/auditd restart
 
 ##### Clean the system
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) ${GREEN}Cleaning${RESET} the system"

@@ -322,6 +322,14 @@ grep -q '^## dirsearch' "${file}" 2>/dev/null \
 #--- Apply new alias
 source "${file}" || source ~/.zshrc
 
+##### Configure Metasploit
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configure ${GREEN}Metasploit${RESET} ~ exploit framework"
+#--- Setup alias
+file=~/.msf4/msfconsole.rc; [ -e "${file}" ] && cp -n $file{,.bkup} 
+([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
+echo -e 'setg prompt [%T] %L (s:%S j:%J)' >> "${file}"
+echo -e 'spool msf-console.log' >> "${file}"
+
 ##### Time taken
 finish_time=$(date +%s)
 echo -e "\n\n ${YELLOW}[i]${RESET} Time (roughly) taken: ${YELLOW}$(( $(( finish_time - start_time )) / 60 )) minutes${RESET}"

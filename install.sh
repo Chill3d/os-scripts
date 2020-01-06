@@ -104,7 +104,7 @@ else
 fi
 #--- GitHub under DDoS?
 (( STAGE++ )); echo -e " ${GREEN}[i]${RESET} (${STAGE}/${TOTAL}) Checking ${GREEN}GitHub status${RESET}"
-timeout 300 curl --progress -k -L -f "https://kctbh9vrtdwd.statuspage.io/api/v2/status.json" | grep -q "All Systems Operational" \
+timeout 300 curl --progress-bar -k -L -f "https://kctbh9vrtdwd.statuspage.io/api/v2/status.json" | grep -q "All Systems Operational" \
   || (echo -e ' '${RED}'[!]'${RESET}" ${RED}GitHub is currently having issues${RESET}. ${BOLD}Lots may fail${RESET}. See: https://status.github.com/" 1>&2 \
     && exit 1)
 
@@ -340,20 +340,20 @@ git config --global push.default simple
 
 ##### Install cyberchef
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CyberChef${RESET} ~ Conversion WebApp"
-timeout 300 curl --progress -k -L -f "https://github.com/gchq/CyberChef/releases/download/v9.11.0/CyberChef_v9.11.0.zip" > /var/www/html/cyberchef_v9.11.0.zip \
+timeout 300 curl --progress-bar -k -L -f "https://github.com/gchq/CyberChef/releases/download/v9.12.0/CyberChef_v9.12.0.zip" > /var/www/html/cyberchef_v9.12.0.zip \
   || echo -e ' '${RED}'[!] Issue with CyberChef download'${RESET} 1>&2
-unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v9.11.0.zip \
+unzip -o -d /var/www/html/cyberchef /var/www/html/cyberchef_v9.12.0.zip \
   || echo -e ' '${RED}'[!] Issue with unzip Cyberchef'${RESET} 1>&2
 ln -sf /var/www/html/cyberchef/CyberChef_*.html /var/www/html/cyberchef/cyberchef.htm
 
 ##### Install Notable
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Notable${RESET} ~ Note-taking App"
-timeout 300 curl --progress -k -L -f "https://github.com/notable/notable/releases/download/v1.8.0/notable_1.8.0_amd64.deb" > /tmp/notable.deb \
-  || echo -e ' '${RED}'[!] Issue with Notable download'${RESET} 1>&2
-if [ -e /tmp/notable.deb ]; then
-  dpkg -i /tmp/notable.deb \
-  || echo -e ' '${RED}'[!] Issue with Notable install'${RESET} 1>&2
-fi
+#(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Notable${RESET} ~ Note-taking App"
+#timeout 300 curl --progress-bar -k -L -f "https://github.com/notable/notable/releases/download/v1.8.2/notable_1.8.2_amd64.deb" > /tmp/notable.deb \
+#  || echo -e ' '${RED}'[!] Issue with Notable download'${RESET} 1>&2
+#if [ -e /tmp/notable.deb ]; then
+#  dpkg -i /tmp/notable.deb \
+#  || echo -e ' '${RED}'[!] Issue with Notable install'${RESET} 1>&2
+#fi
 
 ##### Install metasploit ~ http://docs.kali.org/general-use/starting-metasploit-framework-in-kali
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}metasploit${RESET} ~ exploit framework"
@@ -530,6 +530,7 @@ for FILE in network-manager-openvpn network-manager-pptp network-manager-vpnc op
   apt -y -qq install "${FILE}" \
     || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 done
+
 ##### Install hashid
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}hashid${RESET} ~ identify hash types"
 apt -y -qq install hashid \
@@ -637,7 +638,7 @@ apt -y -qq install wordlists curl \
   && gzip -dc < /usr/share/wordlists/rockyou.txt.gz > /usr/share/wordlists/rockyou.txt
 #--- Add 10,000 Top/Worst/Common Passwords
 mkdir -p /usr/share/wordlists/
-curl --progress -k -L -f "https://raw.githubusercontent.com/Chill3d/SecLists/master/Passwords/Common-Credentials/10k-most-common.txt" > /usr/share/wordlists/10kcommon.txt 2>/dev/null \
+curl --progress-bar -k -L -f "https://raw.githubusercontent.com/Chill3d/SecLists/master/Passwords/Common-Credentials/10k-most-common.txt" > /usr/share/wordlists/10kcommon.txt 2>/dev/null \
   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading 10kcommon.zip" 1>&2
 #--- Linking to more - folders
 [ -e /usr/share/dirb/wordlists ] \
@@ -762,7 +763,7 @@ apt -y -qq install nbtscan \
 #nbtscan -r 192.168.0.1/24 -v
 #--- unixwiz - 1.0.x
 mkdir -p /usr/local/src/nbtscan-unixwiz/
-timeout 300 curl --progress -k -L -f "http://unixwiz.net/tools/nbtscan-source-1.0.35.tgz" > /usr/local/src/nbtscan-unixwiz/nbtscan.tgz \
+timeout 300 curl --progress-bar -k -L -f "http://unixwiz.net/tools/nbtscan-source-1.0.35.tgz" > /usr/local/src/nbtscan-unixwiz/nbtscan.tgz \
   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading nbtscan.tgz" 1>&2    #***!!! hardcoded version! Need to manually check for updates
 tar -zxf /usr/local/src/nbtscan-unixwiz/nbtscan.tgz -C /usr/local/src/nbtscan-unixwiz/
 pushd /usr/local/src/nbtscan-unixwiz/ >/dev/null
@@ -807,7 +808,7 @@ apt -y -qq install curl \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
 arch="i386"
 [[ "$(uname -m)" == "x86_64" ]] && arch="amd64"
-timeout 300 curl --progress -k -L -f "http://dbeaver.jkiss.org/files/dbeaver-ce_latest_${arch}.deb" > /tmp/dbeaver.deb \
+timeout 300 curl --progress-bar -k -L -f "http://dbeaver.jkiss.org/files/dbeaver-ce_latest_${arch}.deb" > /tmp/dbeaver.deb \
   || echo -e ' '${RED}'[!]'${RESET}" Issue downloading dbeaver.deb" 1>&2   #***!!! hardcoded version! Need to manually check for updates
 if [ -e /tmp/dbeaver.deb ]; then
   dpkg -i /tmp/dbeaver.deb

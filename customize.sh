@@ -186,7 +186,7 @@ EOF
 ##### Install ZSH & Oh-My-ZSH - root user.   Note:  'Open terminal here', will not work with ZSH.   Make sure to have tmux already installed
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}ZSH${RESET} & ${GREEN}Oh-My-ZSH${RESET} ~ unix shell"
 #--- Setup oh-my-zsh
-timeout 300 curl --progress -k -L -f "https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh" | zsh
+timeout 300 curl --progress-bar -k -L -f "https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh" | zsh
 #--- Configure zsh
 file=~/.zshrc; [ -e "${file}" ] && cp -n $file{,.bkup}   #/etc/zsh/zshrc
 ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
@@ -325,7 +325,7 @@ source "${file}" || source ~/.zshrc
 ##### Configure Metasploit
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Configure ${GREEN}Metasploit${RESET} ~ exploit framework"
 #--- Setup alias
-file=~/.msf4/msfconsole.rc; [ -e "${file}" ] && cp -n $file{,.bkup} 
+file=~/.msf4/msfconsole.rc; [ -e "${file}" ] && cp -n $file{,.bkup} || mkdir ~/.msf4/
 ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
 echo -e 'setg prompt [%T] %L (s:%S j:%J)' >> "${file}"
 echo -e 'spool msf-console.log' >> "${file}"

@@ -348,7 +348,7 @@ ln -sf /var/www/html/cyberchef/CyberChef_*.html /var/www/html/cyberchef/cyberche
 
 ##### Install Notable
 #(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Notable${RESET} ~ Note-taking App"
-#timeout 300 curl --progress-bar -k -L -f "https://github.com/notable/notable/releases/download/v1.8.2/notable_1.8.2_amd64.deb" > /tmp/notable.deb \
+#timeout 300 curl --progress-bar -k -L -f "https://github.com/notable/notable/releases/download/v1.8.4/notable_1.8.4_amd64.deb" > /tmp/notable.deb \
 #  || echo -e ' '${RED}'[!] Issue with Notable download'${RESET} 1>&2
 #if [ -e /tmp/notable.deb ]; then
 #  dpkg -i /tmp/notable.deb \

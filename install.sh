@@ -612,11 +612,19 @@ done
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Responder${RESET} ~ rogue server"
 apt -y -qq install responder \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+file=/etc/responder/Responder.conf;
+sed -i 's/SMB = On/SMB = Off/' "${file}"
+sed -i 's/HTTP = On/HTTP = Off/' "${file}"
 
 ##### Install Bloodhound
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Bloodhound${RESET} ~ Six Degrees of Domain Admin"
-apt -y -qq install bloodhound \
+apt -y -qq install bloodhound curl \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+mkdir /opt/SharpHound-git
+curl --progress-bar -k -L -f "https://raw.githubusercontent.com/BloodHoundAD/BloodHound/master/Ingestors/SharpHound.ps1" > /opt/SharpHound-git/SharpHound.ps1 2>/dev/null \
+  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading SharpHound.ps1" 1>&2
+curl --progress-bar -k -L -f "https://raw.githubusercontent.com/BloodHoundAD/BloodHound/master/Ingestors/SharpHound.exe" > /opt/SharpHound-git/SharpHound.exe 2>/dev/null \
+  || echo -e ' '${RED}'[!]'${RESET}" Issue downloading SharpHound.exe" 1>&2
 
 ##### Install seclist
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}seclist${RESET} ~ multiple types of (word)lists (and similar things)"
@@ -664,9 +672,9 @@ popd >/dev/null
 
 ##### Install CrackMapExec
 (( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}CrackMapExec${RESET} ~ Swiss army knife for Windows environments"
-apt -y -qq install git \
+apt -y -qq install git libssl-dev libffi-dev python-dev build-essential \
   || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
-git clone -q -b master https://github.com/byt3bl33d3r/CrackMapExec.git /opt/crackmapexec-git/ \
+git clone -q -b master --recursive https://github.com/byt3bl33d3r/CrackMapExec.git /opt/crackmapexec-git/ \
   || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
 pushd /opt/crackmapexec-git/ >/dev/null
 git pull -q
@@ -799,6 +807,30 @@ popd >/dev/null
 git clone -q -b master https://github.com/smicallef/spiderfoot /opt/spiderfoot-git/ \
   || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
 pushd /opt/spiderfoot-git/ >/dev/null
+git pull -q
+popd >/dev/null
+
+##### Install IKEEXT DLL Hijacking Exploit Tool
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Ikeext-Privesc${RESET} ~ IKEEXT DLL Hijacking Exploit Tool"
+git clone -q -b master https://github.com/itm4n/Ikeext-Privesc /opt/Ikeext-Privesc-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/Ikeext-Privesc-git/ >/dev/null
+git pull -q
+popd >/dev/null
+
+##### Install net-creds
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}PrivExchange${RESET} ~ Exploiting Exchange"
+git clone -q -b master https://github.com/DanMcInerney/net-creds /opt/net-creds-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/net-creds-git/ >/dev/null
+git pull -q
+popd >/dev/null
+
+##### Install net-creds
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}net-creds${RESET} ~ PCAP creds finder"
+git clone -q -b master https://github.com/dirkjanm/PrivExchange /opt/PrivExchange-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/PrivExchange-git/ >/dev/null
 git pull -q
 popd >/dev/null
 

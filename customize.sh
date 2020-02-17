@@ -328,7 +328,7 @@ source "${file}" || source ~/.zshrc
 file=~/.msf4/msfconsole.rc; [ -e "${file}" ] && cp -n $file{,.bkup} || mkdir ~/.msf4/
 ([[ -e "${file}" && "$(tail -c 1 ${file})" != "" ]]) && echo >> "${file}"
 echo -e 'setg prompt [%T] %L (s:%S j:%J)' >> "${file}"
-echo -e 'spool msf-console.log' >> "${file}"
+echo -e 'spool ~/.CMD_LOG/msf-console.log' >> "${file}"
 
 ##### Time taken
 finish_time=$(date +%s)

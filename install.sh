@@ -824,18 +824,53 @@ git pull -q
 popd >/dev/null
 
 ##### Install net-creds
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}PrivExchange${RESET} ~ Exploiting Exchange"
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}net-creds${RESET} ~ PCAP creds finder"
 git clone -q -b master https://github.com/DanMcInerney/net-creds /opt/net-creds-git/ \
   || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
 pushd /opt/net-creds-git/ >/dev/null
 git pull -q
 popd >/dev/null
 
-##### Install net-creds
-(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}net-creds${RESET} ~ PCAP creds finder"
+##### Install PrivExchange
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}PrivExchange${RESET} ~ Exploiting Exchange"
 git clone -q -b master https://github.com/dirkjanm/PrivExchange /opt/PrivExchange-git/ \
   || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
 pushd /opt/PrivExchange-git/ >/dev/null
+git pull -q
+popd >/dev/null
+
+##### Install OneRuleToRuleThemAll
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}OneRuleToRuleThemAll${RESET} ~ hashcat rule"
+git clone -q -b master https://github.com/NotSoSecure/password_cracking_rules /opt/password_cracking_rules-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/password_cracking_rules-git/ >/dev/null
+git pull -q
+popd >/dev/null
+ln -sf /opt/password_cracking_rules-git/OneRuleToRuleThemAll.rule /usr/share/hashcat/rules/
+
+##### Install MS17-010
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}MS17-010${RESET} ~ exploit MS17-010 (64 & 32 bits)"
+git clone -q -b master https://github.com/worawit/MS17-010 /opt/MS17-010-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/MS17-010-git/ >/dev/null
+git pull -q
+popd >/dev/null
+
+##### Install Evil-WinRM
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Evil-WinRM${RESET} ~ WinRM interaction tool"
+gem install evil-winrm \
+  || echo -e ' '${RED}'[!] Issue with gem install'${RESET} 1>&2
+
+##### Install Impacket
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Impacket${RESET} ~ Tools collection for network protocols"
+apt -y -qq install python3-impacket \
+  || echo -e ' '${RED}'[!] Issue with apt install'${RESET} 1>&2
+
+##### Install Goddi
+(( STAGE++ )); echo -e "\n\n ${GREEN}[+]${RESET} (${STAGE}/${TOTAL}) Installing ${GREEN}Goodi${RESET} ~ AD dump info"
+git clone -q -b master https://github.com/NetSPI/goddi /opt/goddi-git/ \
+  || echo -e ' '${RED}'[!] Issue when git cloning'${RESET} 1>&2
+pushd /opt/goddi-git/ >/dev/null
 git pull -q
 popd >/dev/null
 

@@ -5,7 +5,7 @@ Personnal script installing tools on a fresh Kali Linux. Issued from https://git
 ## Packets installed
 * ntp ntpdate
 * xinput
-* kali-linux-full
+* kali-linux-large
 * grc
 * bash-completion
 * terminator
@@ -48,6 +48,9 @@ Personnal script installing tools on a fresh Kali Linux. Issued from https://git
 * seclists
 * wordlists
 * smbmap
+* python3-impacket
+* evil-winrm
+
 
 ## Applications downloaded
 * Cyberchef
@@ -71,3 +74,9 @@ Personnal script installing tools on a fresh Kali Linux. Issued from https://git
 * [patator](https://github.com/lanjelot/patator.git)
 * [GitTools](https://github.com/internetwache/GitTools)
 * [SpiderFoot](https://github.com/smicallef/spiderfoot)
+* [Ikeext-Privesc](https://github.com/itm4n/Ikeext-Privesc)
+* [net-creds](https://github.com/DanMcInerney/net-creds)
+* [PrivExchange](https://github.com/dirkjanm/PrivExchange)
+* [OneRuleToRuleThemAll](https://github.com/NotSoSecure/password_cracking_rules)
+* [MS17-010](https://github.com/worawit/MS17-010)
+* [Goddi](https://github.com/NetSPI/goddi)
